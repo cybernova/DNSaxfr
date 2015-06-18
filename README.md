@@ -34,6 +34,7 @@ The syntax is very simple:
 * **0 Arguments and Options:**
 
 The script acts like a filter, reads from stdin and writes on stdout, useful for using it in a pipeline.
+
 **NOTE:** It takes one domain to test per line
 
 * **1+ Arguments:**
