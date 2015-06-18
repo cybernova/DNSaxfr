@@ -48,6 +48,15 @@ The script tests every domain specified as argument, writing the output on stdou
 
 ```
 
+## Example
+
+```bash
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh State.tx.us
+DOMAIN State.tx.us:
+ ns9.tex-an.net. VULNERABLE!
+ ns2.ots.utsystem.edu. ns.tx.net. ns.capnet.State.tx.us. ns3.tamu.edu. tybalt.caltech.edu. NOT VULNERABLE!
+```
+
 ## Tested Environments
 
 * GNU/Linux
