@@ -53,7 +53,7 @@ The script tests every domain specified as argument, writing the output on stdou
 
 If you have successfully tested this script on others systems or platforms please let me know.
 
-License
+License and Donations
 -------
 
 Written by Andrea 'cybernova' Dari and licensed under GNU GPL v2.0
