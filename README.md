@@ -28,7 +28,7 @@ Usage and Options
 The syntax is very simple:
 
 ```
-./DNSaxfr.sh [OPTION...][SITE...]
+./DNSaxfr.sh [OPTION...][DOMAIN...]
 
 ```
 * **0 Arguments and Options:**
