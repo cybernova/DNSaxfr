@@ -32,7 +32,7 @@ filter()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# POSIX_Backup script. Please visit the project's website at: https://github.com/cybernova/POSIX_Backup"
+	echo "# DNS axfr vulnerability testing script. Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2015 Andrea 'cybernova' Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
