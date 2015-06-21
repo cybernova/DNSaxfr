@@ -29,6 +29,17 @@ filter()
 	done
 }
 
+alexaTop500()
+{
+	for VAL in $(seq 0 19)
+	do
+		for SITE in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$1" | cat - | grep site-listing | cut -d ">" -f 7 | cut -d "<" -f 1)
+		do
+			digSite $SITE
+		done
+	done
+}
+
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
@@ -66,22 +77,28 @@ digSite()
 			NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 		fi
 	done
-	echo "DOMAIN $1:"	
-	[ -n "$VULNERABLE" ] && echo "$VULNERABLE VULNERABLE!"
-	[ -n "$NOT_VULNERABLE" ] && echo "$NOT_VULNERABLE NOT VULNERABLE!"
+	[ -n "$VULNERABLE" ] && echo "DOMAIN $1:$VULNERABLE VULNERABLE!"
+	[ -n "$NOT_VULNERABLE" ] && echo "DOMAIN $1:$NOT_VULNERABLE NOT VULNERABLE!"
 	unset VULNERABLE NOT_VULNERABLE
 }
 
 default()
 {
-	while getopts ':if:' OPTION
+	while getopts ':c:i' OPTION
 	do
 		case $OPTION in
+		c)
+			alexaTop500 $OPTARG
+			exit 0;;
 		i)
-			iMode;;
+			iMode
+			exit 0;;
 		\?)
 			echo "Option not reconized...exiting"
 			exit 1;;
+		:)  
+			echo "Option -$OPTARG requires an argument"
+			exit 2;;
 		esac
 	done	
 	shift $(($OPTIND - 1 ))
