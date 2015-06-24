@@ -67,12 +67,14 @@ iMode()
 digSite()
 {
 	#$1 domain to test
+	FILE="${1}_axfr.log"
 	NS="$(dig $1 ns | egrep "^$1" | awk '{ print $5 }')"
 	for NSERVER in $(echo $NS)
 	do
 		if dig @$NSERVER $1 axfr | egrep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
 		then
 			VULNERABLE="$VULNERABLE $NSERVER"
+			[ ! -e $FILE ] && dig @$NSERVER $1 axfr > $FILE
 		else
 			NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 		fi
@@ -87,12 +89,8 @@ default()
 	while getopts ':c:i' OPTION
 	do
 		case $OPTION in
-		c)
-			alexaTop500 $OPTARG
-			exit 0;;
-		i)
-			iMode
-			exit 0;;
+		c)ALEXA500='enabled'; COUNTRY="$OPTARG";;
+		i)IMODE='enabled';;
 		\?)
 			echo "Option not reconized...exiting"
 			exit 1;;
@@ -101,7 +99,9 @@ default()
 			exit 2;;
 		esac
 	done	
-	shift $(($OPTIND - 1 ))
+	shift $(($OPTIND - 1))
+	[ "$ALEXA500" = 'enabled' ] && alexaTop500 $COUNTRY && exit 0
+	[ "$IMODE" = 'enabled' ] && iMode && exit 0
 	for CONT in $(seq 1 $#)
 	do
 	digSite ${!CONT}
