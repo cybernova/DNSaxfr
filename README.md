@@ -31,6 +31,7 @@ The syntax is very simple:
 ./DNSaxfr.sh [OPTION...][DOMAIN...]
 
 ```
+
 * **0 Arguments and Options:**
 
 The script acts like a filter, reads from stdin and writes on stdout, useful for using it in a pipeline.
@@ -55,7 +56,21 @@ The script tests every domain specified as argument, writing the output on stdou
 andrea@Workstation:~/Desktop$ ./DNSaxfr.sh State.tx.us
 DOMAIN State.tx.us: ns9.tex-an.net. VULNERABLE!
 DOMAIN State.tx.us: ns.tx.net. ns3.tamu.edu. ns2.ots.utsystem.edu. ns.capnet.State.tx.us. tybalt.caltech.edu. NOT VULNERABLE!
+andrea@Workstation:~/Desktop$ ls
+State.tx.us_axfr.log
+andrea@Workstation:~/Desktop$ less State.tx.us_axfr.log
+; <<>> DiG 9.9.5-9-Debian <<>> @ns9.tex-an.net. State.tx.us axfr
+; (1 server found)
+;; global options: +cmd
+state.tx.us.            86400   IN      SOA     ns9.tex-an.net. hostmaster.capnet.state.tx.us. 2015060902 7200 3600 3456000 900
+state.tx.us.            86400   IN      NS      ns9.tex-an.net.
+state.tx.us.            86400   IN      NS      ns.tx.net.
+state.tx.us.            86400   IN      NS      ns.capnet.state.tx.us.
+state.tx.us.            86400   IN      NS      ns3.tamu.edu.
+...
 ```
+
+**NOTE:** As you can see a copy of the DNS database for a vulnerable domain is saved in the working directory in this form: domain_axfr.log
 
 ## Tested Environments
 
