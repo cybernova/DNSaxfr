@@ -40,6 +40,23 @@ alexaTop500()
 	done
 }
 
+usage()
+{
+	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
+	echo -e  "Shell script for testing DNS AXFR vulnerability\n"
+	echo "0 ARGUMENTS:"
+	echo "The script acts like a filter, reads from stdin and writes on stdout, useful for using it in a pipeline."
+	echo "NOTE: It takes one domain to test per line"
+	echo "1+ ARGUMENTS:"
+	echo "The script tests every domain specified as argument, writing the output on stdout."
+	echo "OPTIONS:"
+	echo "-c COUNTRY_CODE Test Alexa top 500 sites by country"
+	echo "-h              Display the help and exit"
+	echo "-i              Interactive mode"
+	echo "-p              Use proxychains to safely query name servers"
+	echo "-z              Save the zone transfer in the wd in this form: domain_axfr.log" 
+}
+
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
@@ -71,10 +88,10 @@ digSite()
 	NS="$(dig $1 ns | egrep "^$1" | awk '{ print $5 }')"
 	for NSERVER in $(echo $NS)
 	do
-		if dig @$NSERVER $1 axfr | egrep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
+		if $PROXY dig @$NSERVER $1 axfr | egrep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
 		then
 			VULNERABLE="$VULNERABLE $NSERVER"
-			[ ! -e $FILE ] && dig @$NSERVER $1 axfr > $FILE
+			[ ! -e $FILE ] && [ $ZONETRAN = 'enabled' ] && $PROXY dig @$NSERVER $1 axfr > $FILE
 		else
 			NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 		fi
@@ -84,13 +101,16 @@ digSite()
 	unset VULNERABLE NOT_VULNERABLE
 }
 
-default()
+parse()
 {
-	while getopts ':c:i' OPTION
+	while getopts ':c:hipz' OPTION
 	do
 		case $OPTION in
 		c)ALEXA500='enabled'; COUNTRY="$OPTARG";;
+		h)usage && exit 0;;
 		i)IMODE='enabled';;
+		p)[ ! -f /usr/bin/proxychains ] && echo "Proxychains is not installed...exiting" && exit 3 || PROXY='proxychains';;
+		z)ZONETRAN='enabled';;
 		\?)
 			echo "Option not reconized...exiting"
 			exit 1;;
@@ -100,8 +120,10 @@ default()
 		esac
 	done	
 	shift $(($OPTIND - 1))
+
 	[ "$ALEXA500" = 'enabled' ] && alexaTop500 $COUNTRY && exit 0
 	[ "$IMODE" = 'enabled' ] && iMode && exit 0
+
 	for CONT in $(seq 1 $#)
 	do
 	digSite ${!CONT}
@@ -112,11 +134,5 @@ default()
 #SCRIPT START
 #############
 
-case $# in
-0)
-	filter;;
-*)
-	default "$@";;
-esac
-
+parse "$@"
 exit 0
