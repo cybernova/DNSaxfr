@@ -91,7 +91,7 @@ digSite()
 		if $PROXY dig @$NSERVER $1 axfr | egrep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
 		then
 			VULNERABLE="$VULNERABLE $NSERVER"
-			[ ! -e $FILE ] && [ $ZONETRAN = 'enabled' ] && $PROXY dig @$NSERVER $1 axfr > $FILE
+			[ "$ZONETRAN"  = 'enabled' -a ! -f $FILE ] && $PROXY dig @$NSERVER $1 axfr > $FILE
 		else
 			NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 		fi
