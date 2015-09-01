@@ -25,6 +25,7 @@ filter()
 	#Only the characters found in $IFS are recognized as word delimiters.
 	while read DOMAIN
 	do
+		DOMAIN="$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')"
 		DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
 		digSite $DOMAIN
 	done
@@ -34,7 +35,7 @@ alexaTop500()
 {
 	for VAL in $(seq 0 19)
 	do
-		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$1" | cat - | grep site-listing | cut -d ">" -f 7 | cut -d "<" -f 1)
+		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$1" | cat - | grep site-listing | cut -d ">" -f 7 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
 		do
 			DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
 			digSite $DOMAIN
@@ -56,8 +57,8 @@ usage()
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
 	echo "-p              Use proxychains to safely query name servers"
-	echo "-q 							Quiet mode when using proxychains (all proxychains' output is discarded)"
-	echo "-r							Test recursively every subdomain of a vulnerable domain"
+	echo "-q              Quiet mode when using proxychains (all proxychains' output is discarded)"
+	echo "-r              Test recursively every subdomain of a vulnerable domain"
 	echo "-z              Save the zone transfer in the wd in the following form: domain_axfr.log" 
 }
 
@@ -80,6 +81,7 @@ iMode()
 	echo "Insert the domain you want to test (Ctrl+d to terminate):"
 	while read DOMAIN
 	do
+		DOMAIN="$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')"
 		DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
 		digSite $DOMAIN
 		echo "Insert the domain you want to test (Ctrl+d to terminate):"
@@ -127,7 +129,7 @@ digSite()
 {
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
-	FILE="${1}_axfr.log"
+	FILE="${DOMAIN}_axfr.log"
 	NS="$($QUIET1 $PROXY dig $1 ns $QUIET2 | egrep "^$1" | awk '{ print $5 }')"
 	for NSERVER in $(echo $NS)
 	do
@@ -194,12 +196,12 @@ parse()
 	[ "$IMODE" = 'enabled' ] && iMode && exit 0
 
 	#No arguments
-	[ $# -eq 0 ] && usage && exit 0
+	[ $# -eq 0 ] && filter && exit 0
 
 	#Every site specified as argument is tested
 	for CONT in $(seq 1 $#)
 	do
-	DOMAIN=${!CONT}
+	DOMAIN="$(echo ${!CONT} | tr '[:upper:]' '[:lower:]')"
 	DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
 	digSite $DOMAIN
 	done
