@@ -49,6 +49,8 @@ The script tests every domain specified as argument, writing the output on stdou
 -h              Display the help and exit
 -i              Interactive mode
 -p              Use proxychains to safely query name servers
+-q 							      Quiet mode when using proxychains (all proxychains' output is discarded)
+-r							       Test recursively every subdomain of a vulnerable domain
 -z              Save the zone transfer in the wd in this form: domain_axfr.log
 
 ```
