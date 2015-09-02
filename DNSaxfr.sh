@@ -129,7 +129,7 @@ digSite()
 {
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
-	FILE="${DOMAIN}_axfr.log"
+	FILE="${1}_axfr.log"
 	NS="$($QUIET1 $PROXY dig $1 ns $QUIET2 | egrep "^$1" | awk '{ print $5 }')"
 	for NSERVER in $(echo $NS)
 	do
