@@ -58,20 +58,15 @@ The script tests every domain specified as argument, writing the output on stdou
 ## Example
 
 ```bash
-andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -z State.tx.us
-DOMAIN State.tx.us: ns9.tex-an.net. VULNERABLE!
-DOMAIN State.tx.us: ns.tx.net. ns3.tamu.edu. ns2.ots.utsystem.edu. ns.capnet.State.tx.us. tybalt.caltech.edu. NOT VULNERABLE!
-andrea@Workstation:~/Desktop$ ls
-State.tx.us_axfr.log
-andrea@Workstation:~/Desktop$ less State.tx.us_axfr.log
-; <<>> DiG 9.9.5-9-Debian <<>> @ns9.tex-an.net. State.tx.us axfr
-; (1 server found)
-;; global options: +cmd
-state.tx.us.            86400   IN      SOA     ns9.tex-an.net. hostmaster.capnet.state.tx.us. 2015060902 7200 3600 3456000 900
-state.tx.us.            86400   IN      NS      ns9.tex-an.net.
-state.tx.us.            86400   IN      NS      ns.tx.net.
-state.tx.us.            86400   IN      NS      ns.capnet.state.tx.us.
-state.tx.us.            86400   IN      NS      ns3.tamu.edu.
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -prq unito.it
+DOMAIN unito.it: albert.unito.it. VULNERABLE!
+DOMAIN unito.it: dns.unito.it. moebius.to.infn.it. NOT VULNERABLE!
+|--DOMAIN ac.unito.it.: albert.unito.it. VULNERABLE!
+|  DOMAIN ac.unito.it.: dns.unito.it. NOT VULNERABLE!
+|--DOMAIN agraria.unito.it.: albert.unito.it. VULNERABLE!
+|  DOMAIN agraria.unito.it.: dns.unito.it. NOT VULNERABLE!
+|--DOMAIN agriinnova.unito.it.: albert.unito.it. VULNERABLE!
+|  DOMAIN agriinnova.unito.it.: dns.unito.it. NOT VULNERABLE!
 ...
 ```
 
