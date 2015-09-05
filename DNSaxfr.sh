@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr vulnerability testing script. Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr vulnerability testing script VERSION 1.0. Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2015 Andrea 'cybernova' Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -22,7 +22,7 @@
 
 filter()
 {
-	#Only the characters found in $IFS are recognized as word delimiters.
+	#Only characters found in $IFS are recognized as word delimiters.
 	while read DOMAIN
 	do
 		DOMAIN="$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')"
@@ -35,12 +35,49 @@ alexaTop500()
 {
 	for VAL in $(seq 0 19)
 	do
-		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$1" | cat - | grep site-listing | cut -d ">" -f 7 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
+		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$COUNTRY" | cat - | grep site-listing | cut -d ">" -f 7 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
 		do
 			DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
 			digSite $DOMAIN
 		done
 	done
+}
+
+alexaTop1M()
+{
+	#$ALEXAMFILE is the Alexa's .csv file
+	#$RANGE is the range to test.
+	if echo "$RANGE" | grep "," > /dev/null
+	then
+		RANGE1=$(echo "$RANGE" | cut -d , -f 1)
+		RANGE2=$(echo "$RANGE" | cut -d , -f 2)	
+		#Simple error control	
+		[ ! $RANGE2 -ge $RANGE1 ] && echo "ERROR: Invalid range value" && exit 1
+	fi 
+	if [ -n "$ALEXAMFILE" ]
+	then
+		if [ -n "$RANGE1" ]
+		then
+			for NL in $(seq $RANGE1 $RANGE2)	
+			do
+				DOMAIN=$(egrep "^$NL," $ALEXAMFILE | cut -d , -f 2)
+				DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
+				digSite $DOMAIN 
+			done	
+		else
+			for NL in $(seq $RANGE $(wc -l $ALEXAMFILE | cut -d " " -f 1))	
+			do
+				DOMAIN=$(egrep "^$NL," $ALEXAMFILE | cut -d , -f 2) 
+				DOMAINLVL=$(echo $DOMAIN | sed -e 's/\.$//' | awk -F . '{ print NF }')
+				digSite $DOMAIN
+			done
+		fi
+	else
+		wget "http://s3.amazonaws.com/alexa-static/top-1m.csv.zip"
+		gunzip -S .zip "top-1m.csv.zip"
+		ALEXAMFILE="top-1m.csv"
+		alexaTop1M
+	fi
 }
 
 usage()
@@ -54,8 +91,10 @@ usage()
 	echo "The script tests every domain specified as argument, writing the output on stdout."
 	echo "OPTIONS:"
 	echo "-c COUNTRY_CODE Test Alexa top 500 sites by country"
+	echo "-f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
+	echo "-m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
 	echo "-p              Use proxychains to safely query name servers"
 	echo "-q              Quiet mode when using proxychains (all proxychains' output is discarded)"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
@@ -65,7 +104,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr vulnerability testing script. Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr vulnerability testing script VERSION 1.0. Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2015 Andrea 'cybernova' Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -91,6 +130,7 @@ iMode()
 drawTree()
 {
 	unset TREE1 TREE2
+	#Customize the tree changing this 2 shell variables
 	TREE1="|--"
 	TREE2="|  "
 	if [ "$DOMAIN" = "$1" ]
@@ -110,17 +150,18 @@ drawTree()
 			[ -n "$NOT_VULNERABLE" ] && printf "${TREE2}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		fi
 	else
-		for i in $(seq 1 $LVLDIFF)
+		for i in $(seq 1 $(($LVLDIFF - 1)))
 		do
-			TREE1=" $TREE1"
-			TREE2=" $TREE2"
+				#When customizing the tree "|  " has to be replaced with the TREE2 value
+				TREE1="|  $TREE1"
+				TREE2="|  $TREE2"
 		done
-		[ -n "$VULNERABLE" ] && printf "|${TREE1}DOMAIN $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
+		[ -n "$VULNERABLE" ] && printf "${TREE1}DOMAIN $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
 		if [ ! -n "$VULNERABLE" ]
 		then
-			printf "|${TREE1}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			printf "${TREE1}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		else
-			[ -n "$NOT_VULNERABLE" ] && printf "|${TREE2}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			[ -n "$NOT_VULNERABLE" ] && printf "${TREE2}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		fi
 	fi
 }
@@ -159,11 +200,13 @@ digSite()
 		then
 			for SDOMAIN in $(egrep '[[:space:]]NS[[:space:]]' $FILE | egrep -vi "^$1" | awk '{ print $1 }' | sort -u)
 			do
+				SDOMAIN="$(echo $SDOMAIN | tr '[:upper:]' '[:lower:]')"
 				digSite $SDOMAIN
 			done
 		else
 			for SDOMAIN in $($QUIET1 $PROXY dig @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr $QUIET2 | egrep '[[:space:]]NS[[:space:]]' | egrep -vi "^$1" | awk '{ print $1 }' | sort -u)	
 			do
+				SDOMAIN="$(echo $SDOMAIN | tr '[:upper:]' '[:lower:]')"
 				digSite $SDOMAIN
 			done
 		fi
@@ -172,18 +215,20 @@ digSite()
 
 parse()
 {
-	while getopts ':c:hipqrz' OPTION
+	while getopts ':c:f:him:pqrz' OPTION
 	do
 		case $OPTION in
 		c)ALEXA500='enabled'; COUNTRY="$OPTARG";;
+		f)ALEXAMFILE="$OPTARG";;
 		h)usage && exit 0;;
 		i)IMODE='enabled';;
+		m)ALEXA1M='enabled'; RANGE="$OPTARG";;
 		p)[ ! -x $(which proxychains) ] && echo "Proxychains is not installed...exiting" && exit 3 || PROXY='proxychains';;
 		q)QUIET1='eval'; QUIET2='2>/dev/null';;
 		r)RECURSIVE='enabled';;
 		z)ZONETRAN='enabled';;
 		\?)
-			echo "Option not reconized...exiting"
+			echo "Option -$OPTARG not reconized...exiting"
 			exit 1;;
 		:)  
 			echo "Option -$OPTARG requires an argument"
@@ -192,10 +237,11 @@ parse()
 	done	
 	shift $(($OPTIND - 1))
 
-	[ "$ALEXA500" = 'enabled' ] && alexaTop500 $COUNTRY && exit 0
+	[ "$ALEXA1M" = 'enabled' ] && alexaTop1M && exit 0
+	[ "$ALEXA500" = 'enabled' ] && alexaTop500 && exit 0
 	[ "$IMODE" = 'enabled' ] && iMode && exit 0
 
-	#No arguments
+	#No argument
 	[ $# -eq 0 ] && filter && exit 0
 
 	#Every site specified as argument is tested
