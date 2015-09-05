@@ -46,8 +46,10 @@ The script tests every domain specified as argument, writing the output on stdou
 
 ```
 -c COUNTRY_CODE Test Alexa top 500 sites by country
+-f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option
 -h              Display the help and exit
 -i              Interactive mode
+-m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
 -p              Use proxychains to safely query name servers
 -q              Quiet mode when using proxychains (all proxychains' output is discarded)				     
 -r              Test recursively every subdomain of a vulnerable domain, drawing all in a customizable tree
@@ -55,7 +57,7 @@ The script tests every domain specified as argument, writing the output on stdou
 
 ```
 
-## Example
+## Examples
 
 ```bash
 andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -prq unito.it
@@ -68,6 +70,12 @@ DOMAIN unito.it: dns.unito.it. moebius.to.infn.it. NOT VULNERABLE!
 |--DOMAIN agriinnova.unito.it.: albert.unito.it. VULNERABLE!
 |  DOMAIN agriinnova.unito.it.: dns.unito.it. NOT VULNERABLE!
 ...
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -pqrm 100000,100003 -f top-1m.csv 
+DOMAIN hrbcompass.com: ns3.hrblock.com. ns4.hrblock.com. NOT VULNERABLE!
+DOMAIN mozenda.com: pdns02.domaincontrol.com. pdns01.domaincontrol.com. NOT VULNERABLE!
+DOMAIN sepanta.com: dns01.qom.sepanta.com. dns02.qom.sepanta.com. dns2.shiraz.sepanta.net. ns1.sepanta.net. ns.sepanta.net. dns1.shiraz.sepanta.net. NOT VULNERABLE!
+DOMAIN faslemusic.com: ns1.faslemusic.com. ns2.faslemusic.com. VULNERABLE!
+
 ```
 
 ## Tested Environments
