@@ -45,6 +45,7 @@ The script tests every domain specified as argument, writing the output on stdou
 ***Options:***
 
 ```
+-b              Batch mode, useful for making the output readable when saved in a file
 -c COUNTRY_CODE Test Alexa top 500 sites by country
 -f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option
 -h              Display the help and exit
@@ -56,6 +57,10 @@ The script tests every domain specified as argument, writing the output on stdou
 -z              Save the zone transfer in the wd in this form: domain_axfr.log
 
 ```
+
+***Tips:***
+
+In versions < 4.0 of proxychains the default name server for dns queries is 4.2.2.2, this server sometimes has some problem in name resolving so for a more reliable and faster results I suggest to change this name server with an openDNS server as done in proxychain's version 4.x. To do this you have to change the file: /usr/lib/proxychains3/proxyresolv and change 4.2.2.2 with 208.67.222.222 for example.
 
 ## Examples
 
