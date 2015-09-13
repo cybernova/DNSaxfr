@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr vulnerability testing script VERSION 1.0. Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr vulnerability testing script VERSION 1.0.1 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2015 Andrea 'cybernova' Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -90,6 +90,7 @@ usage()
 	echo "1+ ARGUMENTS:"
 	echo "The script tests every domain specified as argument, writing the output on stdout."
 	echo "OPTIONS:"
+	echo "-b              Batch mode, useful for making the output readable when saved in a file"
 	echo "-c COUNTRY_CODE Test Alexa top 500 sites by country"
 	echo "-f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option"
 	echo "-h              Display the help and exit"
@@ -104,7 +105,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr vulnerability testing script VERSION 1.0. Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr vulnerability testing script VERSION 1.0.1 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2015 Andrea 'cybernova' Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -139,7 +140,6 @@ drawTree()
 		[ -n "$NOT_VULNERABLE" ] && printf "DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		return 
  	fi
-	LVLDIFF=$(( $(echo $1 | sed -e 's/\.$//' | awk -F . '{ print NF }') - $DOMAINLVL))
 	if [ $LVLDIFF -eq 1 ]
 	then
 		[ -n "$VULNERABLE" ] && printf "${TREE1}DOMAIN $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
@@ -196,6 +196,7 @@ digSite()
 	[ -n "$VULNERABLE" -o -n "$NOT_VULNERABLE" ] && drawTree $1
 	if [ "$RECURSIVE" = 'enabled' -a -n "$VULNERABLE" ]
 	then
+		LVLDIFF=$(( $LVLDIFF + 1))
 		if [ -f $FILE ]
 		then
 			for SDOMAIN in $(egrep '[[:space:]]NS[[:space:]]' $FILE | egrep -vi "^$1" | awk '{ print $1 }' | sort -u)
@@ -210,14 +211,16 @@ digSite()
 				digSite $SDOMAIN
 			done
 		fi
+	LVLDIFF=$(( $LVLDIFF - 1))
 	fi
 }
 
 parse()
 {
-	while getopts ':c:f:him:pqrz' OPTION
+	while getopts ':bc:f:him:pqrz' OPTION
 	do
 		case $OPTION in
+		b)unset GREEN RED RCOLOR;;
 		c)ALEXA500='enabled'; COUNTRY="$OPTARG";;
 		f)ALEXAMFILE="$OPTARG";;
 		h)usage && exit 0;;
@@ -259,6 +262,8 @@ parse()
 GREEN='\033[1;92m'
 RED='\033[1;91m'
 RCOLOR='\033[1;00m'
+
+LVLDIFF=0
 
 parse "$@"
 exit 0
