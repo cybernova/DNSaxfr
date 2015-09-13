@@ -60,7 +60,7 @@ The script tests every domain specified as argument, writing the output on stdou
 
 ***Tips:***
 
-In versions < 4.0 of proxychains the default name server for dns queries is 4.2.2.2, this server sometimes has some problem in name resolving so for a more reliable and faster results I suggest to change this name server with an openDNS server as done in proxychain's version 4.x. To do this you have to change the file: /usr/lib/proxychains3/proxyresolv and change 4.2.2.2 with 208.67.222.222 for example.
+In versions < 4.0 of proxychains the default name server for dns queries is 4.2.2.2, this server sometimes has some problem in name resolving so for more reliable and faster results I suggest to change this name server with an openDNS server as done in proxychains' version 4.x. To do this you have to change the file: /usr/lib/proxychains3/proxyresolv and change 4.2.2.2 with 208.67.222.222 for example.
 
 ## Examples
 
