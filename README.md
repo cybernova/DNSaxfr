@@ -72,7 +72,7 @@ DOMAIN unito.it: dns.unito.it. moebius.to.infn.it. NOT VULNERABLE!
 
 andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -zrm 997,999
 Downloading from Amazon top 1 milion sites list...
-File's path: /home/andrea/Desktop/top-1m.csv
+File path: /home/andrea/Desktop/top-1m.csv
 DOMAIN express.pk: jill.ns.cloudflare.com. greg.ns.cloudflare.com. NOT VULNERABLE!
 DOMAIN 114la.com: ns2.dnsv4.com. ns1.dnsv4.com. NOT VULNERABLE!
 DOMAIN coupons.com: ns5-66.akam.net. ns4-67.akam.net. ns1-219.akam.net. ns7-64.akam.net. NOT VULNERABLE!
