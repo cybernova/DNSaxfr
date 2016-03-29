@@ -1,7 +1,7 @@
 DNSaxfr
 ====
 
-Shell script for testing DNS AXFR vulnerability.
+Shell script for testing DNS zone transfer misconfiguration .
 
 Details of the problem and how to fix it, can be found here: https://www.us-cert.gov/ncas/alerts/TA15-103A
 
@@ -50,22 +50,16 @@ The script tests every domain specified as argument, writing the output on stdou
 -f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option
 -h              Display the help and exit
 -i              Interactive mode
--m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
--p              Use proxychains to safely query name servers
--q              Quiet mode when using proxychains (all proxychains' output is discarded)				     
+-m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)   
 -r              Test recursively every subdomain of a vulnerable domain, drawing all in a customizable tree
--z              Save the zone transfer in the wd in this form: domain_axfr.log
+-z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log
 
 ```
-
-***Tips:***
-
-In versions < 4.0 of proxychains the default name server for dns queries is 4.2.2.2, this server sometimes has some problem in name resolving so for more reliable and faster results I suggest to change this name server with an openDNS server as done in proxychains' version 4.x. To do this you have to change the file: /usr/lib/proxychains3/proxyresolv and change 4.2.2.2 with 208.67.222.222 for example.
 
 ## Examples
 
 ```bash
-andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -prq unito.it
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -rz unito.it
 DOMAIN unito.it: albert.unito.it. VULNERABLE!
 DOMAIN unito.it: dns.unito.it. moebius.to.infn.it. NOT VULNERABLE!
 |--DOMAIN ac.unito.it.: albert.unito.it. VULNERABLE!
@@ -75,11 +69,18 @@ DOMAIN unito.it: dns.unito.it. moebius.to.infn.it. NOT VULNERABLE!
 |--DOMAIN agriinnova.unito.it.: albert.unito.it. VULNERABLE!
 |  DOMAIN agriinnova.unito.it.: dns.unito.it. NOT VULNERABLE!
 ...
-andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -pqrm 100000,100003 -f top-1m.csv 
-DOMAIN hrbcompass.com: ns3.hrblock.com. ns4.hrblock.com. NOT VULNERABLE!
-DOMAIN mozenda.com: pdns02.domaincontrol.com. pdns01.domaincontrol.com. NOT VULNERABLE!
-DOMAIN sepanta.com: dns01.qom.sepanta.com. dns02.qom.sepanta.com. dns2.shiraz.sepanta.net. ns1.sepanta.net. ns.sepanta.net. dns1.shiraz.sepanta.net. NOT VULNERABLE!
-DOMAIN faslemusic.com: ns1.faslemusic.com. ns2.faslemusic.com. VULNERABLE!
+
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -zrm 997,999
+Downloading from Amazon top 1 milion sites list...
+File's path: /home/andrea/Desktop/top-1m.csv
+DOMAIN express.pk: jill.ns.cloudflare.com. greg.ns.cloudflare.com. NOT VULNERABLE!
+DOMAIN 114la.com: ns2.dnsv4.com. ns1.dnsv4.com. NOT VULNERABLE!
+DOMAIN coupons.com: ns5-66.akam.net. ns4-67.akam.net. ns1-219.akam.net. ns7-64.akam.net. NOT VULNERABLE!
+
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -rm 100000,100002 -f top-1m.csv 
+DOMAIN 4055.com: f1g1ns2.dnspod.net. f1g1ns1.dnspod.net. NOT VULNERABLE!
+DOMAIN kickassfacts.com: ns1.kickassfacts.com. ns2.kickassfacts.com. NOT VULNERABLE!
+DOMAIN qonlineshop.com: ns2.dezigndreamz.com. ns1.dezigndreamz.com. VULNERABLE!
 
 ```
 
