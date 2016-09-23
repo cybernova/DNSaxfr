@@ -84,12 +84,6 @@ DOMAIN qonlineshop.com: ns2.dezigndreamz.com. ns1.dezigndreamz.com. VULNERABLE!
 
 ```
 
-## Tested Environments
-
-* GNU/Linux
-
-If you have successfully tested this script on others systems or platforms please let me know.
-
 License and Donations
 -------
 
