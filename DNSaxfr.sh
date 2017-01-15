@@ -4,8 +4,8 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.2 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
-# Copyright (C) 2016 Andrea 'cybernova' Dari (andreadari91@gmail.com)                                   
+# DNS axfr misconfiguration testing script VERSION 1.0.3 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
 # it under the terms of the GNU General Public License as published by                                   
@@ -73,7 +73,7 @@ alexaTop1M()
 		 echo "ERROR: unable to decompress archive" && exit 1
 		fi
 		ALEXAMFILE="top-1m.csv"
-		echo "File's path: $PWD/$ALEXAMFILE"
+		echo "Alexa's top 1m file path: $PWD/$ALEXAMFILE"
 		alexaTop1M
 	fi
 	exit 0
@@ -84,12 +84,11 @@ usage()
 	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
 	echo -e  "Shell script for testing DNS AXFR misconfiguration\n"
 	echo "0 ARGUMENTS:"
-	echo "The script acts like a filter, reads from stdin and writes on stdout, useful for using it in a pipeline."
-	echo "NOTE: It takes one domain to test per line"
+	echo "The script reads from stdin and writes on stdout, it takes one domain to test per line"
 	echo "1+ ARGUMENTS:"
-	echo "The script tests every domain specified as argument, writing the output on stdout."
+	echo "The script tests every domain specified as argument"
 	echo "OPTIONS:"
-	echo "-b              Batch mode, useful for making the output readable when saved in a file"
+	echo "-b              Batch mode, makes the output readable when saved in a file"
 	echo "-c COUNTRY_CODE Test Alexa top 500 sites by country"
 	echo "-f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option"
 	echo "-h              Display the help and exit"
@@ -102,8 +101,8 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.2 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
-	echo "# Copyright (C) 2016 Andrea 'cybernova' Dari (andreadari91@gmail.com)"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.3 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
 	echo "# it under the terms of the GNU General Public License as published by"
@@ -167,14 +166,14 @@ digSite()
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
 	FILE="${1}_axfr.log"
-	NS="$(dig +retry=1 $1 ns | egrep "^$1" | awk '{ print $5 }')"
+	NS="$(dig $DIGOPT $1 ns | egrep "^$1" | awk '{ print $5 }')"
 	#Error control
 	[[ ! -n $NS ]] && return
 	for NSERVER in $NS
 	do
 		if [[ "$ZONETRAN"  = 'y' ]]
 		then
-			if dig @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
+			if dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
 			then
 					[[ ! -d $DOMAIN ]] && mkdir $DOMAIN
 					mv /tmp/$FILE $DOMAIN
@@ -184,7 +183,7 @@ digSite()
 				NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 			fi
 		else
-			if dig @$NSERVER $1 axfr | grep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
+			if dig $DIGOPT @$NSERVER $1 axfr | grep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
 			then
 				VULNERABLE="$VULNERABLE $NSERVER"
 			else
@@ -204,7 +203,7 @@ digSite()
 				digSite $SDOMAIN
 			done
 		else
-			for SDOMAIN in $(dig @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr | grep '[[:space:]]NS[[:space:]]' | egrep -v "^$1" | awk '{ print $1 }' | sort -u)	
+			for SDOMAIN in $(dig $DIGOPT @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr | grep '[[:space:]]NS[[:space:]]' | egrep -v "^$1" | awk '{ print $1 }' | sort -u)	
 			do
 				SDOMAIN="$(echo $SDOMAIN | tr '[:upper:]' '[:lower:]')"
 				digSite $SDOMAIN
@@ -269,6 +268,9 @@ RED='\033[1;91m'
 RCOLOR='\033[1;00m'
 
 LVLDIFF=0
+
+#Dig's options
+DIGOPT='+retry=1'
 
 parse "$@"
 exit 0
