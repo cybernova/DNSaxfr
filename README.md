@@ -34,25 +34,24 @@ The syntax is very simple:
 
 * **0 Arguments:**
 
-The script acts like a filter, reads from stdin and writes on stdout, useful for using it in a pipeline.
-
-**NOTE:** It takes one domain to test per line
+The script reads from stdin and writes on stdout, it takes one domain to test per line.
 
 * **1+ Arguments:**
 
-The script tests every domain specified as argument, writing the output on stdout.
+The script tests every domain specified as argument.
 
 ***Options:***
 
 ```
--b              Batch mode, useful for making the output readable when saved in a file
--c COUNTRY_CODE Test Alexa top 500 sites by country
--f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option
--h              Display the help and exit
--i              Interactive mode
--m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)   
--r              Test recursively every subdomain of a vulnerable domain, drawing all in a customizable tree
--z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log
+
+-b              Batch mode, makes the output readable when saved in a file"
+-c COUNTRY_CODE Test Alexa top 500 sites by country"
+-f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option"
+-h              Display the help and exit"
+-i              Interactive mode"
+-m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
+-r              Test recursively every subdomain of a vulnerable domain"
+-z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log" 
 
 ```
 
