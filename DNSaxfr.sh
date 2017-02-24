@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.3 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.3b Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -35,7 +35,7 @@ alexaTop500()
 {
 	for VAL in {0..19}
 	do
-		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$COUNTRY" | grep site-listing | cut -d ">" -f 7 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
+		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
 		do
 			digSite $DOMAIN
 		done
