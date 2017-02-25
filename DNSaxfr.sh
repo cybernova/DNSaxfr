@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.3b Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.4 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -31,54 +31,6 @@ filter()
 	exit 0
 }
 
-alexaTop500()
-{
-	for VAL in {0..19}
-	do
-		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries;${VAL}/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
-		do
-			digSite $DOMAIN
-		done
-	done
-	exit 0
-}
-
-alexaTop1M()
-{
-	#$ALEXAMFILE is the Alexa's .csv file
-	#$RANGE is the range to test.
-
-	if [ -n "$ALEXAMFILE" ]
-	then
-		if [ -n "$RANGE1" ]
-		then
-			for NL in $(seq $RANGE1 $RANGE2)	
-			do
-				DOMAIN=$(egrep "^$NL," $ALEXAMFILE | cut -d , -f 2)
-				digSite $DOMAIN 
-			done	
-		else
-			for NL in $(seq $RANGE $(wc -l $ALEXAMFILE | cut -d " " -f 1))	
-			do
-				DOMAIN=$(egrep "^$NL," $ALEXAMFILE | cut -d , -f 2) 
-				digSite $DOMAIN
-			done
-		fi
-	else
-		echo "Downloading from Amazon top 1 milion sites list..."
-		if ! wget "http://s3.amazonaws.com/alexa-static/top-1m.csv.zip" -O top-1m.csv.zip; then
-			echo "ERROR: unable to download sites list" && exit 1
-		fi
-		if ! gunzip -fS .zip "top-1m.csv.zip"; then
-		 echo "ERROR: unable to decompress archive" && exit 1
-		fi
-		ALEXAMFILE="top-1m.csv"
-		echo "Alexa's top 1m file path: $PWD/$ALEXAMFILE"
-		alexaTop1M
-	fi
-	exit 0
-}
-
 usage()
 {
 	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
@@ -89,11 +41,8 @@ usage()
 	echo "The script tests every domain specified as argument"
 	echo "OPTIONS:"
 	echo "-b              Batch mode, makes the output readable when saved in a file"
-	echo "-c COUNTRY_CODE Test Alexa top 500 sites by country"
-	echo "-f FILE         Alexa's top 1M sites .csv file. To use in conjuction with -m option"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
-	echo "-m RANGE        Test Alexa top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
 	echo "-z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log" 
 }
@@ -219,20 +168,9 @@ parse()
 	do
 		case $OPTION in
 		b)unset GREEN RED RCOLOR;;
-		c)local ALEXA500='y'; COUNTRY="$OPTARG";;
-		f)ALEXAMFILE="$OPTARG";;
+		f)CISCOMFILE="$OPTARG";;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
-		m)local ALEXA1M='y'; RANGE="$OPTARG"
-						#Error control
-						if [[ "$RANGE" =~ [[:digit:]]+,[[:digit:]]+ ]]
-						then
-							RANGE1=$(echo "$RANGE" | cut -d , -f 1)
-							RANGE2=$(echo "$RANGE" | cut -d , -f 2)	
-							[[ ! $RANGE2 -ge $RANGE1 || ! $RANGE1 -ge 1 || ! $RANGE2 -le 1000000 ]] && echo "ERROR: Invalid range value" && exit 1
-						else
-							[[ ! $RANGE =~ [[:digit:]]+ || ! $RANGE -ge 1 || ! $RANGE -le 1000000 ]] && echo "ERROR: Invalid range value"  && exit 1
-						fi ;;
 		r)RECURSIVE='y';;
 		z)ZONETRAN='y';;
 		\?)
@@ -245,8 +183,6 @@ parse()
 	done	
 	shift $(($OPTIND - 1))
 
-	[[ "$ALEXA1M" = 'y' ]] && alexaTop1M
-	[[ "$ALEXA500" = 'y' ]] && alexaTop500
 	[[ "$IMODE" = 'y' ]] && iMode
 
 	#No argument
