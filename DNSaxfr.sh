@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.4 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.5 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -44,13 +44,14 @@ usage()
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
+	echo "-v							Print DNSaxfr version and exit"
 	echo "-z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log" 
 }
 
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.3 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.5 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -114,8 +115,8 @@ digSite()
 {
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
-	FILE="${1}_axfr.log"
-	NS="$(dig $DIGOPT $1 ns | egrep "^$1" | awk '{ print $5 }')"
+	local FILE="${1}_axfr.log"
+	local NS="$(dig $DIGOPT $1 ns | egrep "^$1" | awk '{ print $5 }')"
 	#Error control
 	[[ ! -n $NS ]] && return
 	for NSERVER in $NS
@@ -164,14 +165,14 @@ digSite()
 
 parse()
 {
-	while getopts ':bc:f:him:pqrz' OPTION
+	while getopts ':bhirvz' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN RED RCOLOR;;
-		f)CISCOMFILE="$OPTARG";;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
 		r)RECURSIVE='y';;
+		v)printf "$VERSION\n"; exit 0;;
 		z)ZONETRAN='y';;
 		\?)
 			echo "Option -$OPTARG not reconized"
@@ -199,6 +200,8 @@ parse()
 #############
 #SCRIPT START
 #############
+VERSION='DNSaxfr v1.0.5 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+
 GREEN='\033[1;92m'
 RED='\033[1;91m'
 RCOLOR='\033[1;00m'
