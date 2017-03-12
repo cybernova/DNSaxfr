@@ -40,33 +40,34 @@ The script tests every domain specified as argument.
 
 ```
 
--b              Batch mode, makes the output readable when saved in a file"
--h              Display the help and exit"
--i              Interactive mode"
--r              Test recursively every subdomain of a vulnerable domain"
--z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log" 
+-b              Batch mode, makes the output readable when saved in a file
+-h              Display the help and exit
+-i              Interactive mode
+-r              Test recursively every subdomain of a vulnerable domain
+-v              Print DNSaxfr version and exit
+-z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log 
 
 ```
 
 ## Examples
 
 ```bash
-andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -rz unito.it
-DOMAIN unito.it: albert.unito.it. VULNERABLE!
-DOMAIN unito.it: dns.unito.it. moebius.to.infn.it. NOT VULNERABLE!
-|--DOMAIN ac.unito.it.: albert.unito.it. VULNERABLE!
-|  DOMAIN ac.unito.it.: dns.unito.it. NOT VULNERABLE!
-|--DOMAIN agraria.unito.it.: albert.unito.it. VULNERABLE!
-|  DOMAIN agraria.unito.it.: dns.unito.it. NOT VULNERABLE!
-|--DOMAIN agriinnova.unito.it.: albert.unito.it. VULNERABLE!
-|  DOMAIN agriinnova.unito.it.: dns.unito.it. NOT VULNERABLE!
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -rz uniba.it
+DOMAIN uniba.it: sirio.csi.uniba.it. gaia.di.uniba.it. VULNERABLE!
+DOMAIN uniba.it: ns1.garr.net. gauss.uniba.it. NOT VULNERABLE!
+|--DOMAIN 22echc.uniba.it.: sirio.csi.uniba.it. gaia.di.uniba.it. VULNERABLE!
+|  DOMAIN 22echc.uniba.it.: gauss.uniba.it. NOT VULNERABLE!
+|--DOMAIN 5p.uniba.it.: sirio.csi.uniba.it. gaia.di.uniba.it. gauss.uniba.it. NOT VULNERABLE!
+|--DOMAIN 626.uniba.it.: gaia.di.uniba.it. sirio.csi.uniba.it. VULNERABLE!
+|  DOMAIN 626.uniba.it.: gauss.uniba.it. NOT VULNERABLE!
+|--DOMAIN agenzia.uniba.it.: sirio.csi.uniba.it. VULNERABLE!
 ...
 ```
 
 License and Donations
 -------
 
-Written by Andrea 'cybernova' Dari and licensed under GNU GPL v2.0
+Written by Andrea Dari and licensed under GNU GPL v2.0
 
 If you have found this script useful I gladly accept donations, also symbolic through Paypal:
 
