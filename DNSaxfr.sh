@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.5 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.5b Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -44,14 +44,14 @@ usage()
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
-	echo "-v							Print DNSaxfr version and exit"
-	echo "-z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log" 
+	echo "-v              Print DNSaxfr version and exit"
+	echo "-z              Save the zone transfer in a directory named as the vulnerable domain" 
 }
 
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.5 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.5b Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -81,18 +81,18 @@ drawTree()
 	local TREE2="|  "
 	if [[ "$DOMAIN" = "$1" ]]
 	then
-		[[ -n "$VULNERABLE" ]] && printf "DOMAIN $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
-		[[ -n "$NOT_VULNERABLE" ]] && printf "DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${BGREEN}DOMAIN${RCOLOR} $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
+		[[ -n "$NOT_VULNERABLE" ]] && printf "${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		return 
  	fi
 	if [[ $LVLDIFF -eq 1 ]]
 	then
-		[[ -n "$VULNERABLE" ]] && printf "${TREE1}DOMAIN $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
 		if [[ ! -n "$VULNERABLE" ]]
 		then
-			printf "${TREE1}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		else
-			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		fi
 	else
 		for i in $(seq 1 $(($LVLDIFF - 1)))
@@ -101,12 +101,12 @@ drawTree()
 				TREE1="|  $TREE1"
 				TREE2="|  $TREE2"
 		done
-		[[ -n "$VULNERABLE" ]] && printf "${TREE1}DOMAIN $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
 		if [[ ! -n "$VULNERABLE" ]]
 		then
-			printf "${TREE1}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		else
-			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}DOMAIN $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
 		fi
 	fi
 }
@@ -118,7 +118,7 @@ digSite()
 	local FILE="${1}_axfr.log"
 	local NS="$(dig $DIGOPT $1 ns | egrep "^$1" | awk '{ print $5 }')"
 	#Error control
-	[[ ! -n $NS ]] && return
+	[[ ! -n $NS ]] && printf "${RED}ERROR:${RCOLOR} $1 is not a domain!${RCOLOR}\n" && return
 	for NSERVER in $NS
 	do
 		if [[ "$ZONETRAN"  = 'y' ]]
@@ -200,9 +200,10 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.5 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.5b Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
+BGREEN='\033[32m'
 RED='\033[1;91m'
 RCOLOR='\033[1;00m'
 
