@@ -45,7 +45,7 @@ The script tests every domain specified as argument.
 -i              Interactive mode
 -r              Test recursively every subdomain of a vulnerable domain
 -v              Print DNSaxfr version and exit
--z              Save the zone transfer in a directory named as the domain vulnerable in the following form: domain_axfr.log 
+-z              Save the zone transfer in a directory named as the domain vulnerable
 
 ```
 
