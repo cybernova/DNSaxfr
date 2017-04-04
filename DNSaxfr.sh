@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.5b Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.6 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -34,7 +34,7 @@ filter()
 usage()
 {
 	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
-	echo -e  "Shell script for testing DNS AXFR misconfiguration\n"
+	echo "Shell script for testing DNS AXFR misconfiguration"
 	echo "0 ARGUMENTS:"
 	echo "The script reads from stdin and writes on stdout, it takes one domain to test per line"
 	echo "1+ ARGUMENTS:"
@@ -43,6 +43,7 @@ usage()
 	echo "-b              Batch mode, makes the output readable when saved in a file"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
+  echo "-n              numeric address format for name servers"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
 	echo "-v              Print DNSaxfr version and exit"
 	echo "-z              Save the zone transfer in a directory named as the vulnerable domain" 
@@ -51,7 +52,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.5b Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.6 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -116,7 +117,17 @@ digSite()
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
 	local FILE="${1}_axfr.log"
-	local NS="$(dig $DIGOPT $1 ns | egrep "^$1" | awk '{ print $5 }')"
+	local NS=""
+	if [[ "$NUMERIC" = 'y' ]]
+	#The dig +short option is used only here, with an axfr query is not useful
+	then
+		for NSERVER in $(dig +short $DIGOPT $1 ns)
+		do
+			NS="$(dig +short $DIGOPT $NSERVER a) $NS"
+		done
+	else
+		NS="$(dig +short $DIGOPT $1 ns)"
+	fi 
 	#Error control
 	[[ ! -n $NS ]] && printf "${RED}ERROR:${RCOLOR} $1 is not a domain!${RCOLOR}\n" && return
 	for NSERVER in $NS
@@ -165,12 +176,13 @@ digSite()
 
 parse()
 {
-	while getopts ':bhirvz' OPTION
+	while getopts ':bhinrvz' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN RED RCOLOR;;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
+		n)NUMERIC='y';;
 		r)RECURSIVE='y';;
 		v)printf "$VERSION\n"; exit 0;;
 		z)ZONETRAN='y';;
@@ -200,7 +212,7 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.5b Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.6 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 BGREEN='\033[32m'
