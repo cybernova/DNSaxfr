@@ -43,6 +43,7 @@ The script tests every domain specified as argument.
 -b              Batch mode, makes the output readable when saved in a file
 -h              Display the help and exit
 -i              Interactive mode
+-n              Numeric address format for name servers
 -r              Test recursively every subdomain of a vulnerable domain
 -v              Print DNSaxfr version and exit
 -z              Save the zone transfer in a directory named as the domain vulnerable
