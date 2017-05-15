@@ -50,7 +50,7 @@ The script tests every domain specified as argument.
 
 ```
 
-## Examples
+## Example
 
 ```bash
 andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -rz uniba.it
