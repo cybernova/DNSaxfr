@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.6 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.6a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -52,7 +52,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.6 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.6a Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -179,7 +179,7 @@ parse()
 	while getopts ':bhinrvz' OPTION
 	do
 		case $OPTION in
-		b)unset GREEN RED RCOLOR;;
+		b)unset GREEN BGREEN RED RCOLOR;;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
 		n)NUMERIC='y';;
@@ -212,7 +212,7 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.6 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.6a Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 BGREEN='\033[32m'
