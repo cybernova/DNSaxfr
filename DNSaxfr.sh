@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.6a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.7 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -31,6 +31,15 @@ filter()
 	exit 0
 }
 
+alexaTop50()
+{
+		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
+		do
+			digSite $DOMAIN
+		done
+	exit 0
+}
+
 usage()
 {
 	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
@@ -41,6 +50,7 @@ usage()
 	echo "The script tests every domain specified as argument"
 	echo "OPTIONS:"
 	echo "-b              Batch mode, makes the output readable when saved in a file"
+  echo "-c COUNTRY_CODE Test Alexa top 50 sites by country"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
   echo "-n              numeric address format for name servers"
@@ -52,7 +62,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.6a Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.7 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -176,10 +186,11 @@ digSite()
 
 parse()
 {
-	while getopts ':bhinrvz' OPTION
+	while getopts ':bc:hinrvz' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN BGREEN RED RCOLOR;;
+		c)local ALEXA50='y'; COUNTRY="$OPTARG";;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
 		n)NUMERIC='y';;
@@ -196,6 +207,7 @@ parse()
 	done	
 	shift $(($OPTIND - 1))
 
+	[[ "$ALEXA50" = 'y' ]] && alexaTop50
 	[[ "$IMODE" = 'y' ]] && iMode
 
 	#No argument
@@ -212,7 +224,7 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.6a Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.7 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 BGREEN='\033[32m'
