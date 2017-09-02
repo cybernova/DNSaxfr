@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.7 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.8 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -40,6 +40,42 @@ alexaTop50()
 	exit 0
 }
 
+alexaTop1M()
+{
+	#$ALEXAMFILE is the Alexa's .csv file
+	#$RANGE is the range to test.
+
+	if [ -n "$ALEXAMFILE" ]
+	then
+		if [ -n "$RANGE1" ]
+		then
+			for NL in $(seq $RANGE1 $RANGE2)	
+			do
+				DOMAIN=$(egrep "^$NL," $ALEXAMFILE | cut -d , -f 2)
+				digSite $DOMAIN 
+			done	
+		else
+			for NL in $(seq $RANGE $(wc -l $ALEXAMFILE | cut -d " " -f 1))	
+			do
+				DOMAIN=$(egrep "^$NL," $ALEXAMFILE | cut -d , -f 2) 
+				digSite $DOMAIN
+			done
+		fi
+	else
+		printf "${YELLOW}INFO:${RCOLOR} Downloading from Amazon top 1 milion sites list...\n"
+		if ! wget "http://s3.amazonaws.com/alexa-static/top-1m.csv.zip" -O top-1m.csv.zip; then
+			printf "${RED}ERROR:${RCOLOR} Unable to download sites list\n" && exit 1
+		fi
+		if ! gunzip -fS .zip "top-1m.csv.zip"; then
+		 echo "${RED}ERROR:${RCOLOR} Unable to decompress archive\n" && exit 1
+		fi
+		ALEXAMFILE="top-1m.csv"
+		printf "${YELLOW}INFO:${RCOLOR} Alexa's top 1m file path: ${GREEN}$PWD/$ALEXAMFILE ${RCOLOR}\n${YELLOW}TIP:${RCOLOR} Use in future the -f option\n"
+		alexaTop1M
+	fi
+	exit 0
+}
+
 usage()
 {
 	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
@@ -50,9 +86,11 @@ usage()
 	echo "The script tests every domain specified as argument"
 	echo "OPTIONS:"
 	echo "-b              Batch mode, makes the output readable when saved in a file"
-  echo "-c COUNTRY_CODE Test Alexa top 50 sites by country"
+  echo "-c COUNTRY_CODE Test Alexa's top 50 sites by country"
+	echo "-f FILE         Alexa's top 1M sites .csv file"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
+	echo "-m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
   echo "-n              numeric address format for name servers"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
 	echo "-v              Print DNSaxfr version and exit"
@@ -62,7 +100,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.7 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.8 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -75,12 +113,12 @@ iMode()
 	echo "# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
 	echo "# GNU General Public License for more details."
 	echo -e "\n\n"
-	echo "Insert the domain you want to test (Ctrl+d to terminate):"
+	echo "Insert the domain to test (Ctrl+d to terminate):"
 	while read DOMAIN 
 	do
 		DOMAIN="$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')"
 		digSite $DOMAIN
-		echo "Insert the domain you want to test (Ctrl+d to terminate):"
+		echo "Insert the domain to test (Ctrl+d to terminate):"
 	done
 	exit 0
 }
@@ -129,14 +167,13 @@ digSite()
 	local FILE="${1}_axfr.log"
 	local NS=""
 	if [[ "$NUMERIC" = 'y' ]]
-	#The dig +short option is used only here, with an axfr query is not useful
 	then
-		for NSERVER in $(dig +short $DIGOPT $1 ns)
+		for NSERVER in $(dig $DIGOPT $1 ns | egrep '[[:space:]]NS[[:space:]]' | awk '{print $5}' )
 		do
 			NS="$(dig +short $DIGOPT $NSERVER a) $NS"
 		done
 	else
-		NS="$(dig +short $DIGOPT $1 ns)"
+		NS="$(dig $DIGOPT $1 ns | egrep '[[:space:]]NS[[:space:]]' | awk '{print $5}')"
 	fi 
 	#Error control
 	[[ ! -n $NS ]] && printf "${RED}ERROR:${RCOLOR} $1 is not a domain!${RCOLOR}\n" && return
@@ -144,7 +181,7 @@ digSite()
 	do
 		if [[ "$ZONETRAN"  = 'y' ]]
 		then
-			if dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
+			if  proxychains dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
 			then
 					[[ ! -d $DOMAIN ]] && mkdir $DOMAIN
 					mv /tmp/$FILE $DOMAIN
@@ -154,7 +191,7 @@ digSite()
 				NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 			fi
 		else
-			if dig $DIGOPT @$NSERVER $1 axfr | grep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
+			if proxychains dig $DIGOPT @$NSERVER $1 axfr | grep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
 			then
 				VULNERABLE="$VULNERABLE $NSERVER"
 			else
@@ -174,7 +211,7 @@ digSite()
 				digSite $SDOMAIN
 			done
 		else
-			for SDOMAIN in $(dig $DIGOPT @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr | grep '[[:space:]]NS[[:space:]]' | egrep -v "^$1" | awk '{ print $1 }' | sort -u)	
+			for SDOMAIN in $(proxychains dig $DIGOPT @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr | grep '[[:space:]]NS[[:space:]]' | egrep -v "^$1" | awk '{ print $1 }' | sort -u)	
 			do
 				SDOMAIN="$(echo $SDOMAIN | tr '[:upper:]' '[:lower:]')"
 				digSite $SDOMAIN
@@ -186,27 +223,39 @@ digSite()
 
 parse()
 {
-	while getopts ':bc:hinrvz' OPTION
+	while getopts ':bc:f:him:nrvz' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN BGREEN RED RCOLOR;;
 		c)local ALEXA50='y'; COUNTRY="$OPTARG";;
+		f)ALEXAMFILE="$OPTARG";;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
+		m)local ALEXA1M='y'; RANGE="$OPTARG"
+						#Error control
+						if [[ "$RANGE" =~ [[:digit:]]+,[[:digit:]]+ ]]
+						then
+							RANGE1=$(echo "$RANGE" | cut -d , -f 1)
+							RANGE2=$(echo "$RANGE" | cut -d , -f 2)	
+							[[ ! $RANGE2 -ge $RANGE1 || ! $RANGE1 -ge 1 || ! $RANGE2 -le 1000000 ]] && printf "${RED}ERROR:${RCOLOR} Invalid range value\n" && exit 1
+						else
+							[[ ! $RANGE =~ [[:digit:]]+ || ! $RANGE -ge 1 || ! $RANGE -le 1000000 ]] && printf "${RED}ERROR:${RCOLOR} Invalid range value\n"  && exit 1
+						fi ;;
 		n)NUMERIC='y';;
 		r)RECURSIVE='y';;
 		v)printf "$VERSION\n"; exit 0;;
 		z)ZONETRAN='y';;
 		\?)
-			echo "Option -$OPTARG not reconized"
+			printf "${RED}ERROR:${RCOLOR} Option -$OPTARG not reconized\n"
 			exit 1;;
 		:)  
-			echo "Option -$OPTARG requires an argument"
+			printf "${RED}ERROR:${RCOLOR} Option -$OPTARG requires an argument\n"
 			exit 2;;
 		esac
 	done	
 	shift $(($OPTIND - 1))
 
+	[[ "$ALEXA1M" = 'y' ]] && alexaTop1M
 	[[ "$ALEXA50" = 'y' ]] && alexaTop50
 	[[ "$IMODE" = 'y' ]] && iMode
 
@@ -224,10 +273,11 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.7 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.8 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 BGREEN='\033[32m'
+YELLOW='\033[1;93m'
 RED='\033[1;91m'
 RCOLOR='\033[1;00m'
 
