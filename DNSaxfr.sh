@@ -181,7 +181,7 @@ digSite()
 	do
 		if [[ "$ZONETRAN"  = 'y' ]]
 		then
-			if  proxychains dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
+			if  dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
 			then
 					[[ ! -d $DOMAIN ]] && mkdir $DOMAIN
 					mv /tmp/$FILE $DOMAIN
@@ -191,7 +191,7 @@ digSite()
 				NOT_VULNERABLE="$NOT_VULNERABLE $NSERVER"
 			fi
 		else
-			if proxychains dig $DIGOPT @$NSERVER $1 axfr | grep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
+			if dig $DIGOPT @$NSERVER $1 axfr | grep '[[:space:]]NS[[:space:]]' > /dev/null 2>&1
 			then
 				VULNERABLE="$VULNERABLE $NSERVER"
 			else
@@ -211,7 +211,7 @@ digSite()
 				digSite $SDOMAIN
 			done
 		else
-			for SDOMAIN in $(proxychains dig $DIGOPT @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr | grep '[[:space:]]NS[[:space:]]' | egrep -v "^$1" | awk '{ print $1 }' | sort -u)	
+			for SDOMAIN in $(dig $DIGOPT @$(echo $VULNERABLE | awk '{ print $1 }') $1 axfr | grep '[[:space:]]NS[[:space:]]' | egrep -v "^$1" | awk '{ print $1 }' | sort -u)	
 			do
 				SDOMAIN="$(echo $SDOMAIN | tr '[:upper:]' '[:lower:]')"
 				digSite $SDOMAIN
