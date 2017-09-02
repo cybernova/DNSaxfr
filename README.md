@@ -42,8 +42,10 @@ The script tests every domain specified as argument.
 
 -b              Batch mode, makes the output readable when saved in a file
 -c COUNTRY_CODE Test Alexa top 50 sites by country
+-f FILE         Alexa's top 1M sites .csv file
 -h              Display the help and exit
 -i              Interactive mode
+-m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
 -n              Numeric address format for name servers
 -r              Test recursively every subdomain of a vulnerable domain
 -v              Print DNSaxfr version and exit
@@ -73,6 +75,16 @@ DOMAIN google.com: ns4.google.com. ns2.google.com. ns1.google.com. ns3.google.co
 DOMAIN facebook.com: a.ns.facebook.com. b.ns.facebook.com. NOT VULNERABLE!
 DOMAIN amazon.it: ns1.p31.dynect.net. ns2.p31.dynect.net. ns3.p31.dynect.net. pdns6.ultradns.co.uk. pdns2.ultradns.net. ns4.p31.dynect.net. pdns5.ultradns.info. pdns3.ultradns.org. pdns4.ultradns.org. pdns1.ultradns.net. NOT VULNERABLE!
 DOMAIN wikipedia.org: ns2.wikimedia.org. ns0.wikimedia.org. ns1.wikimedia.org. NOT VULNERABLE!
+...
+```
+```bash
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -m 110,112 2>/dev/null
+INFO: Downloading from Amazon top 1 milion sites list...
+INFO: Alexa's top 1m file path: /home/andrea/Desktop/top-1m.csv 
+TIP: Use in future the -f option
+DOMAIN google.nl: ns4.google.com. ns2.google.com. ns3.google.com. ns1.google.com. NOT VULNERABLE!
+DOMAIN google.com.eg: ns4.google.com. ns2.google.com. ns3.google.com. ns1.google.com. NOT VULNERABLE!
+DOMAIN nytimes.com: ns1.p24.dynect.net. dns-plx.sea1.nytimes.com. dns-plx.ewr1.nytimes.com. ns3.p24.dynect.net. ns4.p24.dynect.net. ns2.p24.dynect.net. NOT VULNERABLE!
 ...
 ```
 
