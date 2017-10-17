@@ -1,7 +1,9 @@
 DNSaxfr
 ====
 
-Shell script for testing DNS zone transfer misconfiguration .
+<a href="http://i.imgur.com/OsfLiRs.png"><img src="https://i.imgur.com/wmMgXm5.png?1" /></a>
+
+Shell script for testing DNS zone transfer misconfiguration.
 
 Details of the problem and how to fix it, can be found here: https://www.us-cert.gov/ncas/alerts/TA15-103A
 
@@ -20,8 +22,6 @@ Usage and Options
 -----------------
 
 ***Usage:***
-
-The syntax is very simple:
 
 ```
 ./DNSaxfr.sh [OPTION...][DOMAIN...]
@@ -42,31 +42,19 @@ The script tests every domain specified as argument.
 
 -b              Batch mode, makes the output readable when saved in a file
 -c COUNTRY_CODE Test Alexa top 50 sites by country
--f FILE         Alexa's top 1M sites .csv file
+-f FILE         Alexa's top 1M sites .csv file. To use with -m option
 -h              Display the help and exit
 -i              Interactive mode
 -m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
 -n              Numeric address format for name servers
 -r              Test recursively every subdomain of a vulnerable domain
 -v              Print DNSaxfr version and exit
--z              Save the zone transfer in a directory named as the vulnerable domain
+-z              Save zone transfer data in a directory named as the vulnerable domain
 
 ```
 
 ## Examples
 
-```bash
-andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -rz uniba.it
-DOMAIN uniba.it: sirio.csi.uniba.it. gaia.di.uniba.it. VULNERABLE!
-DOMAIN uniba.it: ns1.garr.net. gauss.uniba.it. NOT VULNERABLE!
-|--DOMAIN 22echc.uniba.it.: sirio.csi.uniba.it. gaia.di.uniba.it. VULNERABLE!
-|  DOMAIN 22echc.uniba.it.: gauss.uniba.it. NOT VULNERABLE!
-|--DOMAIN 5p.uniba.it.: sirio.csi.uniba.it. gaia.di.uniba.it. gauss.uniba.it. NOT VULNERABLE!
-|--DOMAIN 626.uniba.it.: gaia.di.uniba.it. sirio.csi.uniba.it. VULNERABLE!
-|  DOMAIN 626.uniba.it.: gauss.uniba.it. NOT VULNERABLE!
-|--DOMAIN agenzia.uniba.it.: sirio.csi.uniba.it. VULNERABLE!
-...
-```
 ```bash
 andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -c IT
 DOMAIN google.it: ns3.google.com. ns4.google.com. ns2.google.com. ns1.google.com. NOT VULNERABLE!
@@ -92,7 +80,7 @@ DOMAIN nytimes.com: ns1.p24.dynect.net. dns-plx.sea1.nytimes.com. dns-plx.ewr1.n
 License and Donations
 -------
 
-Written by Andrea Dari and licensed under GNU GPL v2.0
+Coded by Andrea Dari and licensed under GNU GPL v2.0
 
 If you have found this script useful I gladly accept donations, also symbolic through Paypal:
 
