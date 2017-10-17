@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.8 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.8a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -70,7 +70,7 @@ alexaTop1M()
 		 echo "${RED}ERROR:${RCOLOR} Unable to decompress archive\n" && exit 1
 		fi
 		ALEXAMFILE="top-1m.csv"
-		printf "${YELLOW}INFO:${RCOLOR} Alexa's top 1m file path: ${GREEN}$PWD/$ALEXAMFILE ${RCOLOR}\n${YELLOW}TIP:${RCOLOR} Use in future the -f option\n"
+		printf "${YELLOW}INFO:${RCOLOR} Alexa's top 1m file path: $PWD/$ALEXAMFILE\n${YELLOW}TIP:${RCOLOR} Use in future the -f option\n"
 		alexaTop1M
 	fi
 	exit 0
@@ -87,20 +87,20 @@ usage()
 	echo "OPTIONS:"
 	echo "-b              Batch mode, makes the output readable when saved in a file"
   echo "-c COUNTRY_CODE Test Alexa's top 50 sites by country"
-	echo "-f FILE         Alexa's top 1M sites .csv file"
+	echo "-f FILE         Alexa's top 1M sites .csv file. To use with -m option"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
 	echo "-m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
-  echo "-n              numeric address format for name servers"
+  echo "-n              Numeric address format for name servers"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
 	echo "-v              Print DNSaxfr version and exit"
-	echo "-z              Save the zone transfer in a directory named as the vulnerable domain" 
+	echo "-z              Save zone transfer data in a directory named as the vulnerable domain" 
 }
 
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.8 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.8a Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -130,18 +130,18 @@ drawTree()
 	local TREE2="|  "
 	if [[ "$DOMAIN" = "$1" ]]
 	then
-		[[ -n "$VULNERABLE" ]] && printf "${BGREEN}DOMAIN${RCOLOR} $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
-		[[ -n "$NOT_VULNERABLE" ]] && printf "${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
+		[[ -n "$NOT_VULNERABLE" ]] && printf "${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
 		return 
  	fi
 	if [[ $LVLDIFF -eq 1 ]]
 	then
-		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
 		if [[ ! -n "$VULNERABLE" ]]
 		then
-			printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
 		else
-			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
 		fi
 	else
 		for i in $(seq 1 $(($LVLDIFF - 1)))
@@ -150,12 +150,12 @@ drawTree()
 				TREE1="|  $TREE1"
 				TREE2="|  $TREE2"
 		done
-		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$VULNERABLE ${GREEN}VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
 		if [[ ! -n "$VULNERABLE" ]]
 		then
-			printf "${TREE1}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
 		else
-			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${BGREEN}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${RED}NOT VULNERABLE!${RCOLOR}\n"
+			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
 		fi
 	fi
 }
@@ -181,7 +181,7 @@ digSite()
 	do
 		if [[ "$ZONETRAN"  = 'y' ]]
 		then
-			if  dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
+			if dig $DIGOPT @$NSERVER $1 axfr | tee /tmp/$FILE | grep "[[:space:]]NS[[:space:]]" > /dev/null 2>&1
 			then
 					[[ ! -d $DOMAIN ]] && mkdir $DOMAIN
 					mv /tmp/$FILE $DOMAIN
@@ -226,8 +226,8 @@ parse()
 	while getopts ':bc:f:him:nrvz' OPTION
 	do
 		case $OPTION in
-		b)unset GREEN BGREEN RED RCOLOR;;
-		c)local ALEXA50='y'; COUNTRY="$OPTARG";;
+		b)unset GREEN YELLOW RED RCOLOR;;
+		c)local ALEXA50='y'; COUNTRY="$(echo $OPTARG | tr '[:lower:]' '[:upper:]')";;
 		f)ALEXAMFILE="$OPTARG";;
 		h)usage; exit 0;;
 		i)local IMODE='y';;
@@ -273,10 +273,9 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.8 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.8a Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
-BGREEN='\033[32m'
 YELLOW='\033[1;93m'
 RED='\033[1;91m'
 RCOLOR='\033[1;00m'
