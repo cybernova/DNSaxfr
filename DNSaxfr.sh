@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.8a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.9 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -94,13 +94,14 @@ usage()
   echo "-n              Numeric address format for name servers"
 	echo "-r              Test recursively every subdomain of a vulnerable domain"
 	echo "-v              Print DNSaxfr version and exit"
+	echo "-x REGEXP       Do not test domains that match with regexp"              
 	echo "-z              Save zone transfer data in a directory named as the vulnerable domain" 
 }
 
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.8a Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.9 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -162,6 +163,8 @@ drawTree()
 
 digSite()
 {
+	#Do not test domains that match with pattern
+	[[ "$OPTIONX" = 'y' && "$1" =~ $REGEXP ]] && return
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
 	local FILE="${1}_axfr.log"
@@ -223,7 +226,7 @@ digSite()
 
 parse()
 {
-	while getopts ':bc:f:him:nrvz' OPTION
+	while getopts ':bc:f:him:nrvx:z' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN YELLOW RED RCOLOR;;
@@ -244,6 +247,7 @@ parse()
 		n)NUMERIC='y';;
 		r)RECURSIVE='y';;
 		v)printf "$VERSION\n"; exit 0;;
+		x)OPTIONX='y'; REGEXP=$OPTARG;;
 		z)ZONETRAN='y';;
 		\?)
 			printf "${RED}ERROR:${RCOLOR} Option -$OPTARG not reconized\n"
@@ -273,7 +277,7 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.8a Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.9 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 YELLOW='\033[1;93m'
