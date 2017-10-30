@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.9 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.0.9a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -101,7 +101,7 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.9 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.0.9a Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
 	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
@@ -131,34 +131,25 @@ drawTree()
 	local TREE2="|  "
 	if [[ "$DOMAIN" = "$1" ]]
 	then
-		[[ -n "$VULNERABLE" ]] && printf "${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
 		[[ -n "$NOT_VULNERABLE" ]] && printf "${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
+		[[ -n "$VULNERABLE" ]] && printf "${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
 		return 
  	fi
-	if [[ $LVLDIFF -eq 1 ]]
-	then
-		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
-		if [[ ! -n "$VULNERABLE" ]]
-		then
-			printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
-		else
-			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
-		fi
-	else
 		for i in $(seq 1 $(($LVLDIFF - 1)))
 		do
 				#When customizing the tree "|   " has to be replaced with the TREE2 value
 				TREE1="|  $TREE1"
 				TREE2="|  $TREE2"
 		done
-		[[ -n "$VULNERABLE" ]] && printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
-		if [[ ! -n "$VULNERABLE" ]]
+		[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
+		if [[ ! -n "$NOT_VULNERABLE" ]]
 		then
-			printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
-		else
-			[[ -n "$NOT_VULNERABLE" ]] && printf "${TREE2}${YELLOW}DOMAIN${RCOLOR} $1:$NOT_VULNERABLE ${GREEN}NOT VULNERABLE!${RCOLOR}\n"
+			printf "${TREE1}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
+		elif [[ -n "$VULNERABLE" ]]
+		then
+			printf "${TREE2}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
 		fi
-	fi
+		
 }
 
 digSite()
@@ -277,7 +268,7 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.9 Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.0.9a Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 YELLOW='\033[1;93m'
