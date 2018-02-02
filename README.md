@@ -1,7 +1,7 @@
 DNSaxfr
 ====
 
-<a href="http://i.imgur.com/OsfLiRs.png"><img src="https://i.imgur.com/wmMgXm5.png?1" /></a>
+<a href="https://i.imgur.com/zMzKlwn.png?1"><img src="https://i.imgur.com/zMzKlwn.png?1" /></a>
 
 Shell script for testing DNS zone transfer misconfiguration.
 
@@ -47,7 +47,7 @@ The script tests every domain specified as argument.
 -i              Interactive mode
 -m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
 -n              Numeric address format for name servers
--r              Test recursively every subdomain of a vulnerable domain
+-r MAXDEPTH     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit
 -v              Print DNSaxfr version and exit
 -x REGEXP       Do not test domains that match with regexp
 -z              Save zone transfer data in a directory named as the vulnerable domain
@@ -80,7 +80,5 @@ License and Donations
 -------
 
 Coded by Andrea Dari and licensed under GNU GPL v2.0
-
-If you have found this script useful I gladly accept donations, also symbolic through Paypal:
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=andreadari91%40gmail%2ecom&lc=IT&item_name=Andrea%20Dari%20IT%20independent%20researcher&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="[paypal]" /></a> or Bitcoin: 1B2KqKm4CgzRfSsXv7VmbmXD9XNQzzLaTW
