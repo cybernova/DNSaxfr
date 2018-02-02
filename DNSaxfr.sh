@@ -4,8 +4,8 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.0.9a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
-# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)                                   
+# DNS axfr misconfiguration testing script VERSION 1.1 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
 # it under the terms of the GNU General Public License as published by                                   
@@ -86,13 +86,13 @@ usage()
 	echo "The script tests every domain specified as argument"
 	echo "OPTIONS:"
 	echo "-b              Batch mode, makes the output readable when saved in a file"
-  echo "-c COUNTRY_CODE Test Alexa's top 50 sites by country"
+  echo "-c COUNTRYCODE  Test Alexa's top 50 sites by country"
 	echo "-f FILE         Alexa's top 1M sites .csv file. To use with -m option"
 	echo "-h              Display the help and exit"
 	echo "-i              Interactive mode"
 	echo "-m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
   echo "-n              Numeric address format for name servers"
-	echo "-r              Test recursively every subdomain of a vulnerable domain"
+	echo "-r MAXDEPTH     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit" 
 	echo "-v              Print DNSaxfr version and exit"
 	echo "-x REGEXP       Do not test domains that match with regexp"              
 	echo "-z              Save zone transfer data in a directory named as the vulnerable domain" 
@@ -101,8 +101,8 @@ usage()
 iMode()
 {
 	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.0.9a Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
-	echo "# Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)"
+	echo "# DNS axfr misconfiguration testing script VERSION 1.1 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
+	echo "# Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)"
 	echo "#"
 	echo "# This shell script is free software: you can redistribute it and/or modify"
 	echo "# it under the terms of the GNU General Public License as published by"
@@ -149,12 +149,11 @@ drawTree()
 		then
 			printf "${TREE2}${YELLOW}DOMAIN${RCOLOR} $1:$VULNERABLE ${RED}VULNERABLE!${RCOLOR}\n"
 		fi
-		
 }
 
 digSite()
 {
-	#Do not test domains that match with pattern
+	#Do not test domains that match with regexp
 	[[ "$OPTIONX" = 'y' && "$1" =~ $REGEXP ]] && return
 	unset VULNERABLE NOT_VULNERABLE
 	#$1 domain to test
@@ -196,6 +195,7 @@ digSite()
 	[[ -n "$VULNERABLE" || -n "$NOT_VULNERABLE" ]] && drawTree $1
 	if [[ "$RECURSIVE" = 'y' && -n "$VULNERABLE" ]]
 	then
+		[[ $MAXDEPTH -eq $LVLDIFF && $MAXDEPTH -ne 0 ]] && return
 		(( LVLDIFF++ ))
 		if [[ -f $DOMAIN/$FILE ]]
 		then 
@@ -217,7 +217,7 @@ digSite()
 
 parse()
 {
-	while getopts ':bc:f:him:nrvx:z' OPTION
+	while getopts ':bc:f:him:nr:vx:z' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN YELLOW RED RCOLOR;;
@@ -226,7 +226,7 @@ parse()
 		h)usage; exit 0;;
 		i)local IMODE='y';;
 		m)local ALEXA1M='y'; RANGE="$OPTARG"
-						#Error control
+						#Simple error control
 						if [[ "$RANGE" =~ [[:digit:]]+,[[:digit:]]+ ]]
 						then
 							RANGE1=$(echo "$RANGE" | cut -d , -f 1)
@@ -236,7 +236,10 @@ parse()
 							[[ ! $RANGE =~ [[:digit:]]+ || ! $RANGE -ge 1 || ! $RANGE -le 1000000 ]] && printf "${RED}ERROR:${RCOLOR} Invalid range value\n"  && exit 1
 						fi ;;
 		n)NUMERIC='y';;
-		r)RECURSIVE='y';;
+		r)RECURSIVE='y'; MAXDEPTH="$OPTARG"
+						#Simple error control
+						[[ ! $MAXDEPTH =~ [[:digit:]]+ || $MAXDEPTH -lt 0 ]] && printf "${RED}ERROR:${RCOLOR} Invalid depth value\n" && exit 1
+						;;
 		v)printf "$VERSION\n"; exit 0;;
 		x)OPTIONX='y'; REGEXP=$OPTARG;;
 		z)ZONETRAN='y';;
@@ -268,7 +271,7 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.0.9a Copyright (C) 2017 Andrea Dari (andreadari91@gmail.com)'
+VERSION='DNSaxfr v1.1 Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 YELLOW='\033[1;93m'
