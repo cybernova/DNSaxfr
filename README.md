@@ -48,7 +48,6 @@ The script tests every domain specified as argument.
 -m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
 -n              Numeric address format for name servers
 -r MAXDEPTH     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit
--v              Print DNSaxfr version and exit
 -x REGEXP       Do not test domains that match with regexp
 -z              Save zone transfer data in a directory named as the vulnerable domain
 
