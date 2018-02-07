@@ -4,7 +4,7 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.1 Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# DNS axfr misconfiguration testing script VERSION 1.1a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
 # Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
@@ -33,6 +33,8 @@ filter()
 
 alexaTop50()
 {
+		#Error control
+		wget -qO- "http://www.alexa.com/topsites/countries/$COUNTRY" | egrep 'We do not currently have a top sites list for this country' &> /dev/null && printf "${RED}ERROR:${RCOLOR} Invalid country code\n" && exit 1
 		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
 		do
 			digSite $DOMAIN
@@ -67,7 +69,7 @@ alexaTop1M()
 			printf "${RED}ERROR:${RCOLOR} Unable to download sites list\n" && exit 1
 		fi
 		if ! gunzip -fS .zip "top-1m.csv.zip"; then
-		 echo "${RED}ERROR:${RCOLOR} Unable to decompress archive\n" && exit 1
+		 printf "${RED}ERROR:${RCOLOR} Unable to decompress archive\n" && exit 1
 		fi
 		ALEXAMFILE="top-1m.csv"
 		printf "${YELLOW}INFO:${RCOLOR} Alexa's top 1m file path: $PWD/$ALEXAMFILE\n${YELLOW}TIP:${RCOLOR} Use in future the -f option\n"
@@ -78,48 +80,48 @@ alexaTop1M()
 
 usage()
 {
-	echo "Usage: DNSaxfr.sh [OPTION...][DOMAIN...]"
-	echo "Shell script for testing DNS AXFR misconfiguration"
-	echo "0 ARGUMENTS:"
-	echo "The script reads from stdin and writes on stdout, it takes one domain to test per line"
-	echo "1+ ARGUMENTS:"
-	echo "The script tests every domain specified as argument"
-	echo "OPTIONS:"
-	echo "-b              Batch mode, makes the output readable when saved in a file"
-  echo "-c COUNTRYCODE  Test Alexa's top 50 sites by country"
-	echo "-f FILE         Alexa's top 1M sites .csv file. To use with -m option"
-	echo "-h              Display the help and exit"
-	echo "-i              Interactive mode"
-	echo "-m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)"
-  echo "-n              Numeric address format for name servers"
-	echo "-r MAXDEPTH     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit" 
-	echo "-v              Print DNSaxfr version and exit"
-	echo "-x REGEXP       Do not test domains that match with regexp"              
-	echo "-z              Save zone transfer data in a directory named as the vulnerable domain" 
+	printf "${YELLOW}Usage:${RCOLOR} DNSaxfr.sh [OPTION...][DOMAIN...]\n"
+	printf "Shell script for testing DNS AXFR misconfiguration\n"
+	printf "${YELLOW}0 ARGUMENTS:${RCOLOR}\n"
+	printf "The script reads from stdin and writes on stdout, it takes one domain to test per line\n"
+	printf "${YELLOW}1+ ARGUMENTS:${RCOLOR}\n"
+	printf "The script tests every domain specified as argument\n"
+	printf "${YELLOW}OPTIONS:${RCOLOR}\n"
+	printf -- "${GREEN}-b${RCOLOR}              Batch mode, makes the output readable when saved in a file\n"
+  printf -- "${GREEN}-c${RCOLOR} ${RED}COUNTRYCODE${RCOLOR}  Test Alexa's top 50 sites by country\n"
+	printf -- "${GREEN}-f${RCOLOR} ${RED}FILE${RCOLOR}         Alexa's top 1M sites .csv file. To use with -m option\n"
+	printf -- "${GREEN}-h${RCOLOR}              Display the help and exit\n"
+	printf -- "${GREEN}-i${RCOLOR}              Interactive mode\n"
+	printf -- "${GREEN}-m${RCOLOR} ${RED}RANGE${RCOLOR}        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)\n"
+  printf -- "${GREEN}-n${RCOLOR}              Numeric address format for name servers\n"
+	printf -- "${GREEN}-r${RCOLOR} ${RED}MAXDEPTH${RCOLOR}     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit\n" 
+	printf -- "${GREEN}-v${RCOLOR}              Print DNSaxfr version and exit\n"
+	printf -- "${GREEN}-x${RCOLOR} ${RED}REGEXP${RCOLOR}       Do not test domains that match with regexp\n"              
+	printf -- "${GREEN}-z${RCOLOR}              Save zone transfer data in a directory named as the vulnerable domain\n" 
 }
 
 iMode()
 {
-	echo -e "########\n#LICENSE\n########\n"
-	echo "# DNS axfr misconfiguration testing script VERSION 1.1 Please visit the project's website at: https://github.com/cybernova/DNSaxfr"
-	echo "# Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)"
-	echo "#"
-	echo "# This shell script is free software: you can redistribute it and/or modify"
-	echo "# it under the terms of the GNU General Public License as published by"
-	echo "# the Free Software Foundation, either version 3 of the License, or"
-	echo "# any later version."
-	echo "#"
-	echo "# This program is distributed in the hope that it will be useful,"
-	echo "# but WITHOUT ANY WARRANTY; without even the implied warranty of"
-	echo "# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
-	echo "# GNU General Public License for more details."
-	echo -e "\n\n"
-	echo "Insert the domain to test (Ctrl+d to terminate):"
+	printf "${YELLOW}########\n#${RCOLOR}LICENSE\n${YELLOW}########${RCOLOR}\n"
+	printf "${YELLOW}#${RCOLOR} DNS axfr misconfiguration testing script ${GREEN}VERSION 1.1a${RCOLOR} Please visit the project's website at: ${RED}https://github.com/cybernova/DNSaxfr${RCOLOR}\n"
+	printf "${YELLOW}#${RCOLOR} Copyright (C) 2015-2018 ${GREEN}Andrea Dari${RCOLOR} (${RED}andreadari91@gmail.com${RCOLOR})\n"
+	printf "${YELLOW}#${RCOLOR}\n"
+	printf "${YELLOW}#${RCOLOR} This shell script is free software: you can redistribute it and/or modify\n"
+	printf "${YELLOW}#${RCOLOR} it under the terms of the GNU General Public License as published by\n"
+	printf "${YELLOW}#${RCOLOR} the Free Software Foundation, either version 3 of the License, or\n"
+	printf "${YELLOW}#${RCOLOR} any later version.\n"
+	printf "${YELLOW}#${RCOLOR}\n"
+	printf "${YELLOW}#${RCOLOR} This program is distributed in the hope that it will be useful,\n"
+	printf "${YELLOW}#${RCOLOR} but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+	printf "${YELLOW}#${RCOLOR} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+	printf "${YELLOW}#${RCOLOR} GNU General Public License for more details.\n"
+	printf "\n"
+	printf "Insert the domain to test (Ctrl+d to terminate):\n"
 	while read DOMAIN 
 	do
 		DOMAIN="$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')"
 		digSite $DOMAIN
-		echo "Insert the domain to test (Ctrl+d to terminate):"
+		printf "Insert the domain to test (Ctrl+d to terminate):\n"
 	done
 	exit 0
 }
@@ -217,7 +219,7 @@ digSite()
 
 parse()
 {
-	while getopts ':bc:f:him:nr:vx:z' OPTION
+	while getopts ':bc:f:him:nr:x:z' OPTION
 	do
 		case $OPTION in
 		b)unset GREEN YELLOW RED RCOLOR;;
@@ -240,7 +242,6 @@ parse()
 						#Simple error control
 						[[ ! $MAXDEPTH =~ [[:digit:]]+ || $MAXDEPTH -lt 0 ]] && printf "${RED}ERROR:${RCOLOR} Invalid depth value\n" && exit 1
 						;;
-		v)printf "$VERSION\n"; exit 0;;
 		x)OPTIONX='y'; REGEXP=$OPTARG;;
 		z)ZONETRAN='y';;
 		\?)
@@ -271,7 +272,6 @@ parse()
 #############
 #SCRIPT START
 #############
-VERSION='DNSaxfr v1.1 Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)'
 
 GREEN='\033[1;92m'
 YELLOW='\033[1;93m'
