@@ -95,7 +95,6 @@ usage()
 	printf -- "${GREEN}-m${RCOLOR} ${RED}RANGE${RCOLOR}        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)\n"
   printf -- "${GREEN}-n${RCOLOR}              Numeric address format for name servers\n"
 	printf -- "${GREEN}-r${RCOLOR} ${RED}MAXDEPTH${RCOLOR}     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit\n" 
-	printf -- "${GREEN}-v${RCOLOR}              Print DNSaxfr version and exit\n"
 	printf -- "${GREEN}-x${RCOLOR} ${RED}REGEXP${RCOLOR}       Do not test domains that match with regexp\n"              
 	printf -- "${GREEN}-z${RCOLOR}              Save zone transfer data in a directory named as the vulnerable domain\n" 
 }
