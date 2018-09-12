@@ -1,7 +1,7 @@
 DNSaxfr
 ====
 
-<a href="https://i.imgur.com/zMzKlwn.png?1"><img src="https://i.imgur.com/zMzKlwn.png?1" /></a>
+<a href="https://i.imgur.com/iqPJk8U.png?1"><img src="https://i.imgur.com/iqPJk8U.png?1" /></a>
 
 Shell script for testing DNS zone transfer misconfiguration.
 
@@ -40,11 +40,10 @@ The script tests every domain specified as argument.
 
 ```
 
--b              Batch mode, makes the output readable when saved in a file
 -c COUNTRY_CODE Test Alexa top 50 sites by country
+-e              Make the script output exportable to a file
 -f FILE         Alexa's top 1M sites .csv file. To use with -m option
 -h              Display the help and exit
--i              Interactive mode
 -m RANGE        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)
 -n              Numeric address format for name servers
 -r MAXDEPTH     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit
