@@ -4,8 +4,8 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.1a Please visit the project's website at: https://github.com/cybernova/DNSaxfr
-# Copyright (C) 2015-2018 Andrea Dari (andreadari91@gmail.com)                                   
+# DNS axfr misconfiguration testing script VERSION 1.1b Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# Copyright (C) 2015-2018 Andrea Dari (andreadari@protonmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
 # it under the terms of the GNU General Public License as published by                                   
@@ -87,42 +87,15 @@ usage()
 	printf "${YELLOW}1+ ARGUMENTS:${RCOLOR}\n"
 	printf "The script tests every domain specified as argument\n"
 	printf "${YELLOW}OPTIONS:${RCOLOR}\n"
-	printf -- "${GREEN}-b${RCOLOR}              Batch mode, makes the output readable when saved in a file\n"
   printf -- "${GREEN}-c${RCOLOR} ${RED}COUNTRYCODE${RCOLOR}  Test Alexa's top 50 sites by country\n"
+	printf -- "${GREEN}-e${RCOLOR}              Make the script output exportable to a file\n"
 	printf -- "${GREEN}-f${RCOLOR} ${RED}FILE${RCOLOR}         Alexa's top 1M sites .csv file. To use with -m option\n"
 	printf -- "${GREEN}-h${RCOLOR}              Display the help and exit\n"
-	printf -- "${GREEN}-i${RCOLOR}              Interactive mode\n"
 	printf -- "${GREEN}-m${RCOLOR} ${RED}RANGE${RCOLOR}        Test Alexa's top 1M sites. RANGE examples: 1 (start to test from 1st) or 354,400 (test from 354th to 400th)\n"
   printf -- "${GREEN}-n${RCOLOR}              Numeric address format for name servers\n"
 	printf -- "${GREEN}-r${RCOLOR} ${RED}MAXDEPTH${RCOLOR}     Test recursively every subdomain of a vulnerable domain, descend at most MAXDEPTH levels. 0 means no limit\n" 
 	printf -- "${GREEN}-x${RCOLOR} ${RED}REGEXP${RCOLOR}       Do not test domains that match with regexp\n"              
 	printf -- "${GREEN}-z${RCOLOR}              Save zone transfer data in a directory named as the vulnerable domain\n" 
-}
-
-iMode()
-{
-	printf "${YELLOW}########\n#${RCOLOR}LICENSE\n${YELLOW}########${RCOLOR}\n"
-	printf "${YELLOW}#${RCOLOR} DNS axfr misconfiguration testing script ${GREEN}VERSION 1.1a${RCOLOR} Please visit the project's website at: ${RED}https://github.com/cybernova/DNSaxfr${RCOLOR}\n"
-	printf "${YELLOW}#${RCOLOR} Copyright (C) 2015-2018 ${GREEN}Andrea Dari${RCOLOR} (${RED}andreadari91@gmail.com${RCOLOR})\n"
-	printf "${YELLOW}#${RCOLOR}\n"
-	printf "${YELLOW}#${RCOLOR} This shell script is free software: you can redistribute it and/or modify\n"
-	printf "${YELLOW}#${RCOLOR} it under the terms of the GNU General Public License as published by\n"
-	printf "${YELLOW}#${RCOLOR} the Free Software Foundation, either version 3 of the License, or\n"
-	printf "${YELLOW}#${RCOLOR} any later version.\n"
-	printf "${YELLOW}#${RCOLOR}\n"
-	printf "${YELLOW}#${RCOLOR} This program is distributed in the hope that it will be useful,\n"
-	printf "${YELLOW}#${RCOLOR} but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-	printf "${YELLOW}#${RCOLOR} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-	printf "${YELLOW}#${RCOLOR} GNU General Public License for more details.\n"
-	printf "\n"
-	printf "Insert the domain to test (Ctrl+d to terminate):\n"
-	while read DOMAIN 
-	do
-		DOMAIN="$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')"
-		digSite $DOMAIN
-		printf "Insert the domain to test (Ctrl+d to terminate):\n"
-	done
-	exit 0
 }
 
 drawTree()
@@ -218,14 +191,13 @@ digSite()
 
 parse()
 {
-	while getopts ':bc:f:him:nr:x:z' OPTION
+	while getopts ':c:ef:hm:nr:x:z' OPTION
 	do
 		case $OPTION in
-		b)unset GREEN YELLOW RED RCOLOR;;
 		c)local ALEXA50='y'; COUNTRY="$(echo $OPTARG | tr '[:lower:]' '[:upper:]')";;
+		e)unset GREEN YELLOW RED RCOLOR;;
 		f)ALEXAMFILE="$OPTARG";;
 		h)usage; exit 0;;
-		i)local IMODE='y';;
 		m)local ALEXA1M='y'; RANGE="$OPTARG"
 						#Simple error control
 						if [[ "$RANGE" =~ [[:digit:]]+,[[:digit:]]+ ]]
@@ -255,7 +227,6 @@ parse()
 
 	[[ "$ALEXA1M" = 'y' ]] && alexaTop1M
 	[[ "$ALEXA50" = 'y' ]] && alexaTop50
-	[[ "$IMODE" = 'y' ]] && iMode
 
 	#No argument
 	[[ $# -eq 0 ]] && filter
