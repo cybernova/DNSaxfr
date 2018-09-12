@@ -34,8 +34,8 @@ filter()
 alexaTop50()
 {
 		#Error control
-		wget -qO- "http://www.alexa.com/topsites/countries/$COUNTRY" | egrep 'We do not currently have a top sites list for this country' &> /dev/null && printf "${RED}ERROR:${RCOLOR} Invalid country code\n" && exit 1
-		for DOMAIN in $(wget -qO- "http://www.alexa.com/topsites/countries/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
+		wget -qO- "https://www.alexa.com/topsites/countries/$COUNTRY" | egrep 'We do not currently have a top sites list for this country' &> /dev/null && printf "${RED}ERROR:${RCOLOR} Invalid country code\n" && exit 1
+		for DOMAIN in $(wget -qO- "https://www.alexa.com/topsites/countries/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
 		do
 			digSite $DOMAIN
 		done
@@ -65,7 +65,7 @@ alexaTop1M()
 		fi
 	else
 		printf "${YELLOW}INFO:${RCOLOR} Downloading from Amazon top 1 milion sites list...\n"
-		if ! wget "http://s3.amazonaws.com/alexa-static/top-1m.csv.zip" -O top-1m.csv.zip; then
+		if ! wget "https://s3.amazonaws.com/alexa-static/top-1m.csv.zip" -O top-1m.csv.zip; then
 			printf "${RED}ERROR:${RCOLOR} Unable to download sites list\n" && exit 1
 		fi
 		if ! gunzip -fS .zip "top-1m.csv.zip"; then
