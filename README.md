@@ -3,9 +3,9 @@ DNSaxfr
 
 <a href="https://i.imgur.com/iqPJk8U.png?1"><img src="https://i.imgur.com/iqPJk8U.png?1" /></a>
 
-Shell script for testing DNS zone transfer misconfiguration.
+Shell script for testing DNS zone transfer (AXFR query) on domains.
 
-Details of the issue and how to fix it, can be found here: https://www.us-cert.gov/ncas/alerts/TA15-103A
+Details of the issue and how to fix can be found here: https://www.us-cert.gov/ncas/alerts/TA15-103A
 
 ## Getting started
 
@@ -55,21 +55,30 @@ The script tests every domain specified as argument.
 ## Examples
 
 ```bash
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -r0 berkeley.edu
+DOMAIN berkeley.edu: adns1.berkeley.edu. adns3.berkeley.edu. adns2.berkeley.edu. VULNERABLE!
+|--DOMAIN 1918.berkeley.edu.: adns2.berkeley.edu. adns3.berkeley.edu. adns1.berkeley.edu. VULNERABLE!
+|  |--DOMAIN airbears2.1918.berkeley.edu.: adns3.berkeley.edu. adns1.berkeley.edu. adns2.berkeley.edu. VULNERABLE!
+|  |--DOMAIN aws-ist.1918.berkeley.edu.: adns1.berkeley.edu. adns3.berkeley.edu. adns2.berkeley.edu. VULNERABLE!
+|  |--DOMAIN calnet.1918.berkeley.edu.: adns3.berkeley.edu. adns2.berkeley.edu. adns1.berkeley.edu. VULNERABLE!
+|  |--DOMAIN caltime.1918.berkeley.edu.: adns1.berkeley.edu. adns2.berkeley.edu. adns3.berkeley.edu. VULNERABLE!
+...
+```
+
+```bash
 andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -c IT -x 'google'
 DOMAIN youtube.com: ns2.google.com. ns3.google.com. ns1.google.com. ns4.google.com. NOT VULNERABLE!
 DOMAIN facebook.com: a.ns.facebook.com. b.ns.facebook.com. NOT VULNERABLE!
-DOMAIN amazon.it: ns1.p31.dynect.net. ns2.p31.dynect.net. ns3.p31.dynect.net. pdns6.ultradns.co.uk. pdns2.ultradns.net. ns4.p31.dynect.net. pdns5.ultradns.info. pdns3.ultradns.org. pdns4.ultradns.org. pdns1.ultradns.net. NOT VULNERABLE!
 DOMAIN wikipedia.org: ns2.wikimedia.org. ns0.wikimedia.org. ns1.wikimedia.org. NOT VULNERABLE!
 ...
 ```
 ```bash
-andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -m 110,112 2>/dev/null
+andrea@Workstation:~/Desktop$ ./DNSaxfr.sh -m 110,111 2>/dev/null
 INFO: Downloading from Amazon top 1 milion sites list...
 INFO: Alexa's top 1m file path: /home/andrea/Desktop/top-1m.csv 
 TIP: Use in future the -f option
 DOMAIN google.nl: ns4.google.com. ns2.google.com. ns3.google.com. ns1.google.com. NOT VULNERABLE!
 DOMAIN google.com.eg: ns4.google.com. ns2.google.com. ns3.google.com. ns1.google.com. NOT VULNERABLE!
-DOMAIN nytimes.com: ns1.p24.dynect.net. dns-plx.sea1.nytimes.com. dns-plx.ewr1.nytimes.com. ns3.p24.dynect.net. ns4.p24.dynect.net. ns2.p24.dynect.net. NOT VULNERABLE!
 ...
 ```
 
@@ -79,4 +88,6 @@ License and Donations
 
 Coded by Andrea Dari and licensed under GNU GPL v2.0
 
-Support me for updates and new projects: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=andreadari91%40gmail%2ecom&lc=IT&item_name=Andrea%20Dari%20FOSS%20developer%20support&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="[paypal]" /></a> Thanks!
+Support me for updates and new projects: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=andreadari91%40gmail%2ecom&lc=IT&item_name=Andrea%20Dari%20FOSS%20developer%20support&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="[paypal]" /></a>
+
+Thank you!
