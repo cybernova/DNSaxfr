@@ -4,8 +4,8 @@
 #LICENSE                                                   
 ########
 
-# DNS axfr misconfiguration testing script VERSION 1.1b Please visit the project's website at: https://github.com/cybernova/DNSaxfr
-# Copyright (C) 2015-2018 Andrea Dari (andreadari@protonmail.com)                                   
+# Shell script for testing DNS zone transfer (AXFR query) on domains. VERSION 1.1c Please visit the project's website at: https://github.com/cybernova/DNSaxfr
+# Copyright (C) 2015-2020 Andrea Dari (andreadari@protonmail.com)                                   
 #                                                                                                       
 # This shell script is free software: you can redistribute it and/or modify                             
 # it under the terms of the GNU General Public License as published by                                   
@@ -81,7 +81,7 @@ alexaTop1M()
 usage()
 {
 	printf "${YELLOW}Usage:${RCOLOR} DNSaxfr.sh [OPTION...][DOMAIN...]\n"
-	printf "Shell script for testing DNS AXFR misconfiguration\n"
+	printf "Shell script for testing DNS zone transfer (AXFR query) on domains\n"
 	printf "${YELLOW}0 ARGUMENTS:${RCOLOR}\n"
 	printf "The script reads from stdin and writes on stdout, it takes one domain to test per line\n"
 	printf "${YELLOW}1+ ARGUMENTS:${RCOLOR}\n"
@@ -143,7 +143,7 @@ digSite()
 		NS="$(dig $DIGOPT $1 ns | egrep '[[:space:]]NS[[:space:]]' | awk '{print $5}')"
 	fi 
 	#Error control
-	[[ ! -n $NS ]] && printf "${RED}ERROR:${RCOLOR} $1 is not a domain!${RCOLOR}\n" && return
+	[[ ! -n $NS ]] && printf "${RED}ERROR:${RCOLOR} $1 is not a domain! (No A or AAAA records for $1 NS)${RCOLOR}\n" >/dev/stderr && return
 	for NSERVER in $NS
 	do
 		if [[ "$ZONETRAN"  = 'y' ]]
@@ -173,7 +173,7 @@ digSite()
 		(( LVLDIFF++ ))
 		if [[ -f $DOMAIN/$FILE ]]
 		then 
-			for SDOMAIN in $(grep "[[:space:]]NS[[:space:]]" $DOMAIN/$FILE | egrep -v "^$1" | awk '{ print $1 }' | sort -u)
+			for SDOMAIN in $(grep "IN[[:space:]]*[[:space:]]NS[[:space:]]" $DOMAIN/$FILE | egrep -v "^$1" | awk '{ print $1 }' | sort -u)
 			do
 				SDOMAIN="$(echo $SDOMAIN | tr '[:upper:]' '[:lower:]')"
 				digSite $SDOMAIN
@@ -251,7 +251,7 @@ RCOLOR='\033[1;00m'
 LVLDIFF=0
 
 #Dig's options
-DIGOPT='+retry=1'
+DIGOPT='+retry=1 +noidnout'
 
 parse "$@"
 exit 0
