@@ -83,7 +83,7 @@ DOMAIN google.com.eg: ns4.google.com. ns2.google.com. ns3.google.com. ns1.google
 ```
 
 
-License and Donations
+License
 -------
 
 Coded by Andrea Dari and licensed under GNU GPL v2.0
