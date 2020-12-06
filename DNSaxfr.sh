@@ -35,7 +35,7 @@ alexaTop50()
 {
 		#Error control
 		wget -qO- "https://www.alexa.com/topsites/countries/$COUNTRY" | egrep 'We do not currently have a top sites list for this country' &> /dev/null && printf "${RED}ERROR:${RCOLOR} Invalid country code\n" && exit 1
-		for DOMAIN in $(wget -qO- "https://www.alexa.com/topsites/countries/$COUNTRY" | egrep '^<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
+		for DOMAIN in $(wget -qO- "https://www.alexa.com/topsites/countries/$COUNTRY" | egrep '^.*<a href.*/siteinfo/' | cut -d ">" -f 2 | cut -d "<" -f 1 | tr '[:upper:]' '[:lower:]')
 		do
 			digSite $DOMAIN
 		done
